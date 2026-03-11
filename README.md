@@ -13,7 +13,23 @@
 npx clawdoctor
 ```
 
-That's it! Opens a web UI in your browser, automatically diagnoses your OpenClaw installation, and offers one-click fixes.
+Opens a clean web UI with two powerful buttons:
+
+### 🔍 **Diagnose Button**
+- Scans your entire OpenClaw setup
+- Shows human-readable results
+- Lists all detected issues
+- Provides step-by-step fix options
+- You choose what to fix
+
+### ⚡ **Scan & Fix Button** 
+- Automatically scans your system
+- Finds all issues
+- **Auto-executes low-risk fixes**
+- Only safe fixes (no data loss)
+- Verifies fixes worked
+
+**Choose your style:** Manual control (Diagnose) or full automation (Scan & Fix)!
 
 ---
 
@@ -28,23 +44,64 @@ That's it! Opens a web UI in your browser, automatically diagnoses your OpenClaw
 
 ---
 
-## 🔍 What It Fixes
+## 🔍 What It Checks (17+ Diagnostic Rules)
 
-✅ Gateway not running  
+### Critical Issues:
+✅ OpenClaw installation status  
+✅ Gateway running state  
+✅ Config file exists & valid JSON  
+✅ Node.js version (v18+ required)  
+✅ File permissions on .openclaw directory  
+✅ CLI commands accessible in PATH  
+
+### Warnings:
 ✅ Port conflicts (18789)  
-✅ Config file errors  
-✅ Node.js version issues  
-✅ LaunchAgent problems (macOS)  
-✅ And more via AI analysis...
+✅ Doctor-detected issues  
+✅ Error logs presence  
+✅ Low disk space  
+✅ LaunchAgent missing (macOS)  
+✅ npm version outdated  
+✅ Version mismatches  
+✅ Missing package.json  
+
+### Info:
+✅ Proxy environment variables  
+✅ Memory usage  
+✅ Process status  
+✅ Recent log analysis
 
 ---
 
 ## 🛠 How It Works
 
-1. **Observe** - Collects system diagnostics (openclaw status, logs, config, etc.)
-2. **Diagnose** - Analyzes with AI (Claude Sonnet 4 via OpenRouter) or rule-based engine
-3. **Repair** - Offers 1-3 fix options with risk levels
-4. **Verify** - Confirms the fix worked
+1. **Observe** - Collects 20+ system metrics:
+   - OpenClaw version & status
+   - Gateway state & processes
+   - Config file validation
+   - Log file analysis (error detection)
+   - Disk space & memory
+   - Environment variables
+   - File permissions
+   - Platform-specific checks (LaunchAgent/Services)
+
+2. **Diagnose** - Runs 17 diagnostic rules:
+   - Rule-based checks (always works)
+   - AI analysis (if OpenRouter API key available)
+   - Severity classification (Critical/Warning/Info)
+
+3. **Repair** - Offers smart fixes:
+   - `openclaw gateway start` - Start stopped gateway
+   - `openclaw doctor --yes` - Auto-repair config issues  
+   - `openclaw gateway restart` - Clear transient problems
+   - `openclaw gateway install --force` - Fix LaunchAgent (macOS)
+   - Permission fixes (Windows/macOS/Linux)
+   - All fixes use official OpenClaw CLI (safe!)
+
+4. **Verify** - Multi-check validation:
+   - OpenClaw status
+   - Gateway health
+   - Config file integrity
+   - Port availability
 
 ---
 
