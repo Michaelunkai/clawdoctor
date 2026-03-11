@@ -1,5 +1,5 @@
 import { observe } from './observe';
-import { applyRules } from './rules';
+import { diagnose } from './diagnose';
 import { saveReport, generateReport } from './report';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -51,10 +51,10 @@ export class HealthCheckScheduler {
     
     try {
       const observation = await observe();
-      const { diagnosis } = applyRules(observation);
+      const diagnosis = await diagnose(observation);
       
       if (!diagnosis.healthy) {
-        console.log('[Scheduler] Issues detected:', diagnosis.diagnosis);
+        console.log('[Scheduler] Issues detected:', diagnosis.diagnosis.length, 'issues');
         
         // Save report
         const report = generateReport(observation, diagnosis);

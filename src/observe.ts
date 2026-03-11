@@ -116,13 +116,23 @@ export async function observe(onProgress?: (msg: string) => void): Promise<Obser
       
       if (logFiles.length > 0) {
         const latestLog = path.join(logDir, logFiles[0]);
-        const logs = fs.readFileSync(latestLog, 'utf-8');
+        let logs = fs.readFileSync(latestLog, 'utf-8');
         const lines = logs.split('\n');
-        recentLogs = lines.slice(-100).join('\n');
+        
+        // Filter to only important lines (warnings, errors, config issues)
+        const importantLines = lines.filter(line => {
+          return line.match(/warning|error|fail|crash|exception|CRITICAL|Config warnings|Doctor warnings|Failed to load/i) &&
+                 !line.includes('Registering') &&
+                 !line.includes('Registered') &&
+                 !line.includes('Service started') &&
+                 !line.includes('listening on');
+        });
+        
+        recentLogs = importantLines.slice(-20).join('\n') || 'No warnings or errors found';
         
         // Extract error lines
         lines.forEach(line => {
-          if (line.match(/error|fail|crash|exception/i)) {
+          if (line.match(/error|fail|crash|exception/i) && !line.includes('NODE_TLS')) {
             errorLogs.push(line.trim());
           }
         });

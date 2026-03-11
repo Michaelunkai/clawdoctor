@@ -3,271 +3,62 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ClawDoctor - 100% Free OpenClaw Diagnostics</title>
+  <title>🦞 ClawDoctor - Free OpenClaw Diagnostics</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Toast Notifications -->
-  <div id="toast-container"></div>
-  
-  <!-- Loading Overlay -->
-  <div id="loading-overlay" class="loading-overlay hidden">
-    <div class="loading-spinner"></div>
-    <div class="loading-text">Initializing ClawDoctor...</div>
-  </div>
-  
   <div class="container">
+    <!-- Header -->
     <header>
-      <div class="header-content">
-        <div>
-          <h1>🦞 ClawDoctor <span class="version-badge">v1.3.0</span></h1>
-          <p class="subtitle">100% Free OpenClaw Diagnostics & Repair</p>
-          <p class="comparison">✨ Better than ClawAid: Free Forever • 40 Rules • Auto-Backup • Open Source <button id="show-comparison" class="link-button">Why?</button></p>
-        </div>
-        <div class="header-controls">
-          <button id="settings-btn" class="btn-icon" title="Settings">⚙️</button>
-          <button id="theme-toggle" class="btn-icon" title="Toggle Dark Mode">🌙</button>
-          <button id="auto-refresh" class="btn-icon" title="Auto-Refresh Every 5min">🔄</button>
-        </div>
+      <div class="logo">
+        <div class="logo-icons">🦞💊</div>
+        <h1>ClawDoctor</h1>
       </div>
+      <p class="tagline">Automatic diagnostics & repair for OpenClaw</p>
     </header>
 
-    <div id="status-area">
-      <div id="start-section" class="section">
-        <div class="start-content">
-          <p class="intro">Check your OpenClaw installation for issues and get automatic fixes.</p>
-          
-          <!-- Quick Stats Dashboard -->
-          <div id="quick-stats" class="stats-dashboard">
-            <div class="stat-card">
-              <div class="stat-icon">💻</div>
-              <div class="stat-value" id="stat-rules">40</div>
-              <div class="stat-label">Diagnostic Rules</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon">🆓</div>
-              <div class="stat-value">$0</div>
-              <div class="stat-label">Cost (vs $1.99)</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon">⚡</div>
-              <div class="stat-value" id="stat-speed">~5s</div>
-              <div class="stat-label">Scan Speed</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon">🔒</div>
-              <div class="stat-value">100%</div>
-              <div class="stat-label">Safe Fixes</div>
-            </div>
-          </div>
-          
-          <div class="button-group">
-            <button id="diagnose-btn" class="btn-primary">
-              🔍 Diagnose
-            </button>
-            <button id="scan-fix-btn" class="btn-success">
-              ⚡ Scan & Fix
-            </button>
-          </div>
-          <p class="description">
-            <strong>Diagnose:</strong> Scan for issues and show what needs fixing<br>
-            <strong>Scan & Fix:</strong> Automatically scan and safely fix all issues
-          </p>
-        </div>
+    <!-- Main Content -->
+    <main id="main-content">
+      <!-- Initial State -->
+      <div id="initial-state" class="section active">
+        <button class="btn-primary" onclick="startDiagnosis()">🔍 Start Diagnosis</button>
       </div>
 
-      <div id="progress-section" class="section hidden">
-        <h2>Scanning...</h2>
-        <div class="progress-bar">
-          <div class="progress-fill"></div>
+      <!-- Scanning State -->
+      <div id="scanning-state" class="section">
+        <div class="scan-header">
+          <span class="icon">🔍</span>
+          <span class="status">System scan in progress...</span>
         </div>
-        
-        <!-- Live System Metrics -->
-        <div id="system-metrics" class="metrics-grid">
-          <div class="metric-item">
-            <span class="metric-label">CPU:</span>
-            <span class="metric-value" id="metric-cpu">--</span>
-          </div>
-          <div class="metric-item">
-            <span class="metric-label">Memory:</span>
-            <span class="metric-value" id="metric-memory">--</span>
-          </div>
-          <div class="metric-item">
-            <span class="metric-label">Extensions:</span>
-            <span class="metric-value" id="metric-extensions">--</span>
-          </div>
-          <div class="metric-item">
-            <span class="metric-label">Network:</span>
-            <span class="metric-value" id="metric-network">--</span>
-          </div>
-        </div>
-        
-        <div id="progress-log"></div>
+        <div id="scan-steps"></div>
       </div>
 
-      <div id="diagnosis-section" class="section hidden">
-        <div id="health-badge"></div>
-        <h2 id="diagnosis-title"></h2>
-        <p id="diagnosis-text"></p>
+      <!-- Results State -->
+      <div id="results-state" class="section">
+        <div class="scan-header complete">
+          <span class="icon">✅</span>
+          <span class="status">System scan complete</span>
+          <button class="link-btn" onclick="showDetails()">Details</button>
+        </div>
         
-        <div id="warnings-section" class="hidden">
-          <h3>⚠️ Warnings</h3>
-          <ul id="warnings-list"></ul>
-        </div>
-
-        <div id="options-section" class="hidden">
-          <h3>🛠️ Repair Options</h3>
-          <div id="options-container"></div>
-        </div>
-
-        <div class="action-buttons">
-          <button onclick="location.reload()" class="btn-secondary">
-            🔄 Scan Again
-          </button>
-          <button id="export-btn" class="btn-secondary">
-            💾 Export Report
-          </button>
-          <button id="export-md-btn" class="btn-secondary">
-            📄 Download Markdown
-          </button>
-        </div>
-      </div>
-
-      <div id="error-section" class="section hidden">
-        <h2>❌ Error</h2>
-        <p id="error-text"></p>
-        <button onclick="location.reload()" class="btn-secondary">Try Again</button>
-      </div>
-
-      <div id="complete-section" class="section hidden">
-        <h2>✅ Complete</h2>
-        <p id="complete-text"></p>
-        <div class="final-actions">
-          <button onclick="location.reload()" class="btn-secondary">
-            🔄 Scan Again
-          </button>
-          <a href="https://github.com/Michaelunkai/clawdoctor" target="_blank" class="github-link">
-            ⭐ Star on GitHub
-          </a>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Settings Modal -->
-    <div id="settings-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close" onclick="document.getElementById('settings-modal').classList.add('hidden')">×</button>
-        <h2>⚙️ Settings</h2>
+        <div id="diagnosis-steps"></div>
         
-        <div class="settings-section">
-          <h3>Scheduled Health Checks</h3>
-          <label class="switch-label">
-            <input type="checkbox" id="schedule-enabled" class="switch">
-            <span>Enable automatic health checks</span>
-          </label>
-          <div id="schedule-options" class="options-group">
-            <label>
-              Interval (minutes):
-              <input type="number" id="schedule-interval" min="5" max="1440" value="60">
-            </label>
-            <label class="switch-label">
-              <input type="checkbox" id="schedule-autofix" class="switch">
-              <span>Auto-fix low-risk issues</span>
-            </label>
+        <!-- Feedback -->
+        <div id="feedback-section" class="feedback-section hidden">
+          <div class="feedback-icon">🩺</div>
+          <p class="feedback-question">Did this fix your problem?</p>
+          <div class="feedback-buttons">
+            <button class="btn-success" onclick="feedbackYes()">✅ Yes, fixed!</button>
+            <button class="btn-error" onclick="feedbackNo()">❌ No, still broken</button>
           </div>
         </div>
-        
-        <div class="settings-section">
-          <h3>Performance</h3>
-          <button class="btn-secondary" onclick="clearCache()">Clear Cache</button>
-          <button class="btn-secondary" onclick="showPerformanceStats()">View Performance Stats</button>
-        </div>
-        
-        <div class="settings-section">
-          <h3>Advanced</h3>
-          <label class="switch-label">
-            <input type="checkbox" id="enable-animations" class="switch" checked>
-            <span>Enable animations</span>
-          </label>
-          <label class="switch-label">
-            <input type="checkbox" id="enable-sound" class="switch">
-            <span>Enable sound notifications</span>
-          </label>
-        </div>
-        
-        <button onclick="saveSettings()" class="btn-primary" style="width:100%;margin-top:20px;">Save Settings</button>
       </div>
-    </div>
-    
-    <!-- Comparison Modal -->
-    <div id="comparison-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close" onclick="document.getElementById('comparison-modal').classList.add('hidden')">×</button>
-        <h2>🏆 Why ClawDoctor Beats ClawAid</h2>
-        <table class="comparison-table">
-          <thead>
-            <tr>
-              <th>Feature</th>
-              <th>ClawAid</th>
-              <th>ClawDoctor ✨</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Cost</td>
-              <td>$1.99 per fix</td>
-              <td><strong>100% FREE Forever</strong></td>
-            </tr>
-            <tr>
-              <td>Diagnostic Rules</td>
-              <td>Unknown (~10)</td>
-              <td><strong>30 Comprehensive Rules</strong></td>
-            </tr>
-            <tr>
-              <td>Auto-Backup</td>
-              <td>❌ No</td>
-              <td><strong>✅ Automatic (config files)</strong></td>
-            </tr>
-            <tr>
-              <td>Report Export</td>
-              <td>❌ No</td>
-              <td><strong>✅ JSON + Markdown</strong></td>
-            </tr>
-            <tr>
-              <td>Network Diagnostics</td>
-              <td>❌ No</td>
-              <td><strong>✅ DNS + Connectivity</strong></td>
-            </tr>
-            <tr>
-              <td>Dark Mode</td>
-              <td>❌ No</td>
-              <td><strong>✅ Yes</strong></td>
-            </tr>
-            <tr>
-              <td>Auto-Refresh</td>
-              <td>❌ No</td>
-              <td><strong>✅ Every 5 minutes</strong></td>
-            </tr>
-            <tr>
-              <td>Open Source</td>
-              <td>❌ Closed</td>
-              <td><strong>✅ MIT License</strong></td>
-            </tr>
-            <tr>
-              <td>Manual + Auto Modes</td>
-              <td>Auto only</td>
-              <td><strong>✅ Both (Diagnose + Scan & Fix)</strong></td>
-            </tr>
-            <tr>
-              <td>Rollback Support</td>
-              <td>❌ No</td>
-              <td><strong>✅ Yes (backup system)</strong></td>
-            </tr>
-          </tbody>
-        </table>
-        <p class="modal-footer">⭐ Star us on <a href="https://github.com/Michaelunkai/clawdoctor" target="_blank">GitHub</a> if you love ClawDoctor!</p>
-      </div>
-    </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <span>ClawDoctor v1.3.0 | 100% Free Forever</span>
+    </footer>
   </div>
 
   <script src="app.js"></script>

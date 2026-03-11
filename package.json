@@ -1,6 +1,6 @@
 {
   "name": "clawdoctor",
-  "version": "1.3.0",
+  "version": "2.0.0",
   "description": "100% Free AI-powered diagnostic and repair tool for OpenClaw",
   "main": "dist/index.js",
   "bin": {

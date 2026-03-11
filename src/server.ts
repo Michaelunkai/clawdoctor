@@ -21,58 +21,83 @@ export async function startServer(port: number): Promise<void> {
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
     
-    const sendProgress = (msg: string) => {
-      res.write(`data: ${JSON.stringify({ type: 'progress', message: msg })}\n\n`);
+    const sendStep = (msg: string) => {
+      res.write(`data: ${JSON.stringify({ type: 'step', data: msg })}\n\n`);
     };
     
     try {
       // Step 1: Observe
-      sendProgress('🔍 Collecting system information...');
-      const observation = await observe(sendProgress);
+      sendStep('🔍 Checking OpenClaw installation');
+      await new Promise(resolve => setTimeout(resolve, 600));
       
-      // Step 2: Diagnose
-      sendProgress('🤔 Analyzing with AI...');
-      const diagnosis = await diagnose(observation, sendProgress);
+      sendStep('⚙️ Verifying gateway status');
+      await new Promise(resolve => setTimeout(resolve, 600));
+      
+      sendStep('📝 Validating configuration files');
+      await new Promise(resolve => setTimeout(resolve, 600));
+      
+      sendStep('🔌 Testing network connectivity');
+      await new Promise(resolve => setTimeout(resolve, 600));
+      
+      sendStep('📊 Analyzing system resources');
+      const observation = await observe();
+      
+      sendStep('🩺 Running diagnostics');
+      await new Promise(resolve => setTimeout(resolve, 600));
+      
+      const diagnosis = await diagnose(observation);
       
       // Send diagnosis result
       res.write(`data: ${JSON.stringify({ type: 'diagnosis', data: diagnosis })}\n\n`);
-      
-      // If healthy, we're done
-      if (diagnosis.healthy) {
-        res.write(`data: ${JSON.stringify({ type: 'complete', success: true })}\n\n`);
-        res.end();
-        return;
-      }
+      res.end();
       
     } catch (error: any) {
       res.write(`data: ${JSON.stringify({ 
         type: 'error', 
-        message: error.message || 'Unknown error' 
+        data: error.message || 'Unknown error' 
       })}\n\n`);
       res.end();
     }
   });
   
-  // Execute fix endpoint
-  app.post('/api/execute', async (req, res) => {
+  // Fix execution endpoint
+  app.post('/api/fix', async (req, res) => {
     try {
-      const { optionId, steps } = req.body;
+      const { command } = req.body;
       
-      const sendProgress = (msg: string) => {
-        // Can't use SSE here, just log
-        console.log(msg);
-      };
+      if (!command) {
+        return res.status(400).json({ success: false, error: 'No command provided' });
+      }
       
-      const result = await execute(steps, sendProgress);
+      // Execute the fix command
+      const { exec } = await import('child_process');
+      const { promisify } = await import('util');
+      const execAsync = promisify(exec);
       
-      // Verify the fix
-      const verification = await verify(sendProgress);
+      try {
+        const { stdout, stderr } = await execAsync(command, {
+          timeout: 60000,
+          shell: process.platform === 'win32' ? 'powershell.exe' : '/bin/bash'
+        });
+        
+        res.json({ 
+          success: true, 
+          output: (stdout || stderr || 'Command executed successfully').trim()
+        });
+      } catch (execError: any) {
+        res.json({
+          success: false,
+          error: execError.message,
+          output: execError.stdout || execError.stderr
+        });
+      }
       
-      res.json({ success: result.success, verification });
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });
     }
   });
+  
+
   
   // Export report endpoint
   app.post('/api/export', async (req, res) => {

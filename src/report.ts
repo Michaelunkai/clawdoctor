@@ -6,67 +6,21 @@ import { DiagnosisResult } from './diagnose';
 
 export interface DiagnosticReport {
   timestamp: string;
-  version: string;
-  system: {
-    platform: string;
-    nodeVersion: string;
-    openclawVersion: string;
-  };
-  health: {
-    healthy: boolean;
-    confidence: number;
-    diagnosis: string;
-  };
-  findings: {
-    critical: string[];
-    warnings: string[];
-    info: string[];
-  };
-  rawData: ObservationData;
+  observation: ObservationData;
+  diagnosis: DiagnosisResult;
 }
 
-export function generateReport(data: ObservationData, diagnosis: DiagnosisResult): DiagnosticReport {
-  const critical: string[] = [];
-  const warnings: string[] = [];
-  const info: string[] = [];
-  
-  // Categorize findings
-  diagnosis.reasoning.forEach(finding => {
-    if (finding.includes('CRITICAL') || finding.includes('❌')) {
-      critical.push(finding);
-    } else if (finding.includes('WARNING') || finding.includes('⚠️')) {
-      warnings.push(finding);
-    } else {
-      info.push(finding);
-    }
-  });
-  
+export function generateReport(observation: ObservationData, diagnosis: DiagnosisResult): DiagnosticReport {
   return {
     timestamp: new Date().toISOString(),
-    version: '1.0.0',
-    system: {
-      platform: data.platform,
-      nodeVersion: data.nodeVersion,
-      openclawVersion: data.openclawVersion
-    },
-    health: {
-      healthy: diagnosis.healthy,
-      confidence: diagnosis.confidence,
-      diagnosis: diagnosis.diagnosis
-    },
-    findings: {
-      critical,
-      warnings,
-      info
-    },
-    rawData: data
+    observation,
+    diagnosis
   };
 }
 
 export function saveReport(report: DiagnosticReport): string {
   const reportsDir = path.join(os.homedir(), '.openclaw', 'clawdoctor-reports');
   
-  // Create reports directory if it doesn't exist
   if (!fs.existsSync(reportsDir)) {
     fs.mkdirSync(reportsDir, { recursive: true });
   }
@@ -100,42 +54,65 @@ export function getRecentReports(limit: number = 10): DiagnosticReport[] {
 }
 
 export function exportReportAsMarkdown(report: DiagnosticReport): string {
-  let md = `# ClawDoctor Diagnostic Report\n\n`;
-  md += `**Generated:** ${new Date(report.timestamp).toLocaleString()}\n`;
-  md += `**Version:** ${report.version}\n\n`;
+  const lines: string[] = [];
   
-  md += `## System Information\n\n`;
-  md += `- **Platform:** ${report.system.platform}\n`;
-  md += `- **Node.js:** ${report.system.nodeVersion}\n`;
-  md += `- **OpenClaw:** ${report.system.openclawVersion}\n\n`;
+  lines.push('# ClawDoctor Diagnostic Report');
+  lines.push('');
+  lines.push(`**Generated:** ${report.timestamp}`);
+  lines.push('');
   
-  md += `## Health Status\n\n`;
-  md += `- **Status:** ${report.health.healthy ? '✅ Healthy' : '⚠️ Issues Detected'}\n`;
-  md += `- **Confidence:** ${(report.health.confidence * 100).toFixed(0)}%\n`;
-  md += `- **Diagnosis:** ${report.health.diagnosis}\n\n`;
+  lines.push('## Health Status');
+  lines.push('');
+  lines.push(`**Status:** ${report.diagnosis.healthy ? '✅ Healthy' : '❌ Issues Detected'}`);
+  lines.push('');
   
-  if (report.findings.critical.length > 0) {
-    md += `## 🔴 Critical Issues\n\n`;
-    report.findings.critical.forEach(f => md += `- ${f}\n`);
-    md += `\n`;
+  if (!report.diagnosis.healthy) {
+    lines.push('## Issues Found');
+    lines.push('');
+    
+    const critical = report.diagnosis.diagnosis.filter(i => i.severity === 'critical');
+    const warnings = report.diagnosis.diagnosis.filter(i => i.severity === 'warning');
+    const info = report.diagnosis.diagnosis.filter(i => i.severity === 'info');
+    
+    if (critical.length > 0) {
+      lines.push('### 🔴 Critical Issues');
+      lines.push('');
+      critical.forEach(issue => {
+        lines.push(`- **${issue.message}**`);
+        if (issue.details) lines.push(`  ${issue.details}`);
+        if (issue.fix) lines.push(`  Fix: \`${issue.fix.command}\``);
+        lines.push('');
+      });
+    }
+    
+    if (warnings.length > 0) {
+      lines.push('### ⚠️ Warnings');
+      lines.push('');
+      warnings.forEach(issue => {
+        lines.push(`- **${issue.message}**`);
+        if (issue.details) lines.push(`  ${issue.details}`);
+        if (issue.fix) lines.push(`  Fix: \`${issue.fix.command}\``);
+        lines.push('');
+      });
+    }
+    
+    if (info.length > 0) {
+      lines.push('### ℹ️ Information');
+      lines.push('');
+      info.forEach(issue => {
+        lines.push(`- ${issue.message}`);
+        if (issue.details) lines.push(`  ${issue.details}`);
+        lines.push('');
+      });
+    }
   }
   
-  if (report.findings.warnings.length > 0) {
-    md += `## ⚠️ Warnings\n\n`;
-    report.findings.warnings.forEach(f => md += `- ${f}\n`);
-    md += `\n`;
-  }
+  lines.push('## System Information');
+  lines.push('');
+  lines.push(`- **Platform:** ${report.observation.platform}`);
+  lines.push(`- **Node.js:** ${report.observation.nodeVersion}`);
+  lines.push(`- **OpenClaw:** ${report.observation.openclawVersion}`);
+  lines.push('');
   
-  if (report.findings.info.length > 0) {
-    md += `## ℹ️ Information\n\n`;
-    report.findings.info.forEach(f => md += `- ${f}\n`);
-    md += `\n`;
-  }
-  
-  md += `## Raw Data\n\n`;
-  md += `<details>\n<summary>Click to expand</summary>\n\n`;
-  md += `\`\`\`json\n${JSON.stringify(report.rawData, null, 2)}\n\`\`\`\n\n`;
-  md += `</details>\n`;
-  
-  return md;
+  return lines.join('\n');
 }
