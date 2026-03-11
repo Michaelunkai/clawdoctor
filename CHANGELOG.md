@@ -1,5 +1,51 @@
 # ClawDoctor Changelog
 
+## [1.3.0] - 2026-03-11 (Maximum Power Update)
+
+### 🚀 MASSIVE Feature Expansion
+
+**New Systems:**
+- ✅ **Scheduled Health Checks** - Automatic monitoring at custom intervals
+- ✅ **Performance Monitoring** - Track diagnostic speeds and optimization metrics
+- ✅ **Cache System** - Speed up repeated diagnostics
+- ✅ **Toast Notifications** - Beautiful in-app notifications
+- ✅ **Settings Panel** - Full configuration UI
+- ✅ **Loading Overlay** - Better visual feedback
+
+**New Features:**
+- Settings modal with scheduler configuration
+- Performance statistics dashboard
+- Cache management (view size, clear cache)
+- Animation toggle
+- Sound notifications toggle
+- Auto-fix scheduler option
+- Toast notification system (success/error/warning/info)
+- Loading overlay with spinner
+
+**New API Endpoints:**
+- `/api/scheduler/status` - Get scheduler configuration
+- `/api/scheduler/update` - Update scheduler settings
+- `/api/performance` - Get performance statistics
+- `/api/cache/clear` - Clear diagnostic cache
+
+**UI/UX Improvements:**
+- Settings button in header
+- Beautiful toast notifications with animations
+- Loading overlay with backdrop blur
+- Switch toggle components
+- Settings sections with visual hierarchy
+- Performance stats viewer
+
+**Technical Improvements:**
+- Modular scheduler system
+- Performance monitoring with timing metrics
+- TTL-based caching
+- Auto-cleanup of expired cache
+- Better error handling
+- Type-safe configuration
+
+---
+
 ## [1.2.0] - 2026-03-11 (ACTUAL 15-Minute Real-Time Update)
 
 ### 🚀 Major Performance & UX Overhaul

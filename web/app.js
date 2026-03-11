@@ -2,6 +2,57 @@
 let currentObservation = null;
 let currentDiagnosis = null;
 let autoRefreshInterval = null;
+let toastId = 0;
+
+// Toast notification system
+function showToast(message, type = 'info', duration = 5000) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.id = `toast-${toastId++}`;
+  
+  const icons = {
+    success: '✅',
+    error: '❌',
+    warning: '⚠️',
+    info: 'ℹ️'
+  };
+  
+  toast.innerHTML = `
+    <div class="toast-icon">${icons[type]}</div>
+    <div class="toast-content">
+      <div class="toast-message">${message}</div>
+    </div>
+    <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+  `;
+  
+  container.appendChild(toast);
+  
+  if (duration > 0) {
+    setTimeout(() => {
+      toast.style.animation = 'slideOut 0.3s ease-in';
+      setTimeout(() => toast.remove(), 300);
+    }, duration);
+  }
+  
+  return toast.id;
+}
+
+// Loading overlay control
+function showLoading(text = 'Loading...') {
+  const overlay = document.getElementById('loading-overlay');
+  if (overlay) {
+    overlay.querySelector('.loading-text').textContent = text;
+    overlay.classList.remove('hidden');
+  }
+}
+
+function hideLoading() {
+  const overlay = document.getElementById('loading-overlay');
+  if (overlay) {
+    overlay.classList.add('hidden');
+  }
+}
 
 // Wait for user action instead of auto-starting
 window.addEventListener('DOMContentLoaded', () => {
@@ -65,6 +116,12 @@ window.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem('clawdoctor-seen-comparison', 'true');
     }, 2000);
   }
+  
+  // Settings button
+  document.getElementById('settings-btn').addEventListener('click', () => {
+    document.getElementById('settings-modal').classList.remove('hidden');
+    loadSettings();
+  });
   
   // Keyboard shortcuts
   document.addEventListener('keydown', (e) => {
@@ -391,4 +448,81 @@ function showReportsHint(count) {
   hint.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#667eea;color:white;padding:12px 20px;border-radius:8px;font-size:0.9em;box-shadow:0 4px 12px rgba(0,0,0,0.2);cursor:pointer;';
   hint.onclick = () => window.open('file://' + require('os').homedir() + '/.openclaw/clawdoctor-reports', '_blank');
   document.body.appendChild(hint);
+}
+
+// Settings functions
+async function loadSettings() {
+  try {
+    const response = await fetch('/api/scheduler/status');
+    const data = await response.json();
+    if (data.success) {
+      document.getElementById('schedule-enabled').checked = data.config.enabled;
+      document.getElementById('schedule-interval').value = data.config.interval;
+      document.getElementById('schedule-autofix').checked = data.config.autoFix || false;
+    }
+  } catch (error) {
+    console.error('Failed to load settings:', error);
+  }
+  
+  // Load UI preferences from localStorage
+  document.getElementById('enable-animations').checked = localStorage.getItem('animations') !== 'false';
+  document.getElementById('enable-sound').checked = localStorage.getItem('sound') === 'true';
+}
+
+async function saveSettings() {
+  const config = {
+    enabled: document.getElementById('schedule-enabled').checked,
+    interval: parseInt(document.getElementById('schedule-interval').value),
+    autoFix: document.getElementById('schedule-autofix').checked
+  };
+  
+  try {
+    const response = await fetch('/api/scheduler/update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(config)
+    });
+    
+    const data = await response.json();
+    if (data.success) {
+      showToast('Settings saved successfully!', 'success');
+      document.getElementById('settings-modal').classList.add('hidden');
+    } else {
+      showToast('Failed to save settings', 'error');
+    }
+  } catch (error) {
+    showToast('Error saving settings: ' + error.message, 'error');
+  }
+  
+  // Save UI preferences
+  localStorage.setItem('animations', document.getElementById('enable-animations').checked);
+  localStorage.setItem('sound', document.getElementById('enable-sound').checked);
+}
+
+async function clearCache() {
+  try {
+    const response = await fetch('/api/cache/clear', { method: 'POST' });
+    const data = await response.json();
+    if (data.success) {
+      showToast('Cache cleared successfully!', 'success');
+    }
+  } catch (error) {
+    showToast('Error clearing cache: ' + error.message, 'error');
+  }
+}
+
+async function showPerformanceStats() {
+  try {
+    const response = await fetch('/api/performance');
+    const data = await response.json();
+    if (data.success) {
+      let stats = 'Performance Statistics:\n\n';
+      for (const [key, value] of Object.entries(data.stats)) {
+        stats += `${key}:\n  Avg: ${value.avg}ms\n  Min: ${value.min}ms\n  Max: ${value.max}ms\n\n`;
+      }
+      alert(stats || 'No performance data available yet');
+    }
+  } catch (error) {
+    showToast('Error loading performance stats: ' + error.message, 'error');
+  }
 }

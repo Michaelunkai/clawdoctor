@@ -7,15 +7,25 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- Toast Notifications -->
+  <div id="toast-container"></div>
+  
+  <!-- Loading Overlay -->
+  <div id="loading-overlay" class="loading-overlay hidden">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Initializing ClawDoctor...</div>
+  </div>
+  
   <div class="container">
     <header>
       <div class="header-content">
         <div>
-          <h1>🦞 ClawDoctor <span class="version-badge">v1.2.0</span></h1>
+          <h1>🦞 ClawDoctor <span class="version-badge">v1.3.0</span></h1>
           <p class="subtitle">100% Free OpenClaw Diagnostics & Repair</p>
           <p class="comparison">✨ Better than ClawAid: Free Forever • 40 Rules • Auto-Backup • Open Source <button id="show-comparison" class="link-button">Why?</button></p>
         </div>
         <div class="header-controls">
+          <button id="settings-btn" class="btn-icon" title="Settings">⚙️</button>
           <button id="theme-toggle" class="btn-icon" title="Toggle Dark Mode">🌙</button>
           <button id="auto-refresh" class="btn-icon" title="Auto-Refresh Every 5min">🔄</button>
         </div>
@@ -140,6 +150,52 @@
             ⭐ Star on GitHub
           </a>
         </div>
+      </div>
+    </div>
+    
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal hidden">
+      <div class="modal-content">
+        <button class="modal-close" onclick="document.getElementById('settings-modal').classList.add('hidden')">×</button>
+        <h2>⚙️ Settings</h2>
+        
+        <div class="settings-section">
+          <h3>Scheduled Health Checks</h3>
+          <label class="switch-label">
+            <input type="checkbox" id="schedule-enabled" class="switch">
+            <span>Enable automatic health checks</span>
+          </label>
+          <div id="schedule-options" class="options-group">
+            <label>
+              Interval (minutes):
+              <input type="number" id="schedule-interval" min="5" max="1440" value="60">
+            </label>
+            <label class="switch-label">
+              <input type="checkbox" id="schedule-autofix" class="switch">
+              <span>Auto-fix low-risk issues</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="settings-section">
+          <h3>Performance</h3>
+          <button class="btn-secondary" onclick="clearCache()">Clear Cache</button>
+          <button class="btn-secondary" onclick="showPerformanceStats()">View Performance Stats</button>
+        </div>
+        
+        <div class="settings-section">
+          <h3>Advanced</h3>
+          <label class="switch-label">
+            <input type="checkbox" id="enable-animations" class="switch" checked>
+            <span>Enable animations</span>
+          </label>
+          <label class="switch-label">
+            <input type="checkbox" id="enable-sound" class="switch">
+            <span>Enable sound notifications</span>
+          </label>
+        </div>
+        
+        <button onclick="saveSettings()" class="btn-primary" style="width:100%;margin-top:20px;">Save Settings</button>
       </div>
     </div>
     

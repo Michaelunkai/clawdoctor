@@ -5,6 +5,9 @@ import { diagnose } from './diagnose';
 import { execute } from './execute';
 import { verify } from './verify';
 import { generateReport, saveReport, getRecentReports, exportReportAsMarkdown } from './report';
+import { scheduler } from './scheduler';
+import { perfMonitor } from './performance';
+import { diagCache } from './cache';
 
 export async function startServer(port: number): Promise<void> {
   const app = express();
@@ -106,6 +109,38 @@ export async function startServer(port: number): Promise<void> {
       res.status(500).json({ success: false, error: error.message });
     }
   });
+  
+  // Scheduler endpoints
+  app.get('/api/scheduler/status', (req, res) => {
+    res.json({ success: true, config: scheduler.getConfig() });
+  });
+  
+  app.post('/api/scheduler/update', (req, res) => {
+    try {
+      scheduler.updateConfig(req.body);
+      res.json({ success: true, config: scheduler.getConfig() });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+  
+  // Performance stats
+  app.get('/api/performance', (req, res) => {
+    res.json({ success: true, stats: perfMonitor.getAllStats() });
+  });
+  
+  // Cache management
+  app.post('/api/cache/clear', (req, res) => {
+    try {
+      diagCache.clear();
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+  
+  // Start scheduler
+  scheduler.start();
   
   return new Promise((resolve) => {
     app.listen(port, () => {
