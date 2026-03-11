@@ -100,7 +100,20 @@ npm publish
 
 ## 🌐 Live Demo
 
-**Coming soon:** Deployed at Vercel/Render (link will be added here)
+**🚀 Deploy it yourself in 2 minutes:**
+
+### Quick Deploy to Render (Free):
+1. Click this button: [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com)
+2. Sign in with GitHub
+3. Click "New +" → "Web Service" 
+4. Connect this repo: `Michaelunkai/clawdoctor`
+5. Render auto-detects `render.yaml` ✓
+6. Click "Create Web Service"
+7. Wait ~3 mins ⏱️
+8. **Copy your live URL** (e.g., `https://clawdoctor-xxxxx.onrender.com`)
+9. Come back here and replace this section with your URL!
+
+**Or use:** Railway, Fly.io, Vercel (see DEPLOY.md for alternatives)
 
 ---
 
