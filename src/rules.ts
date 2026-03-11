@@ -138,6 +138,31 @@ export function applyRules(data: ObservationData): RuleResult {
     }
   }
   
+  // RULE 18: Network connectivity
+  if (data.networkCheck && data.networkCheck.includes('unreachable')) {
+    findings.push('WARNING: Network connectivity issues detected');
+  }
+  
+  // RULE 19: DNS resolution
+  if (data.dnsCheck && (data.dnsCheck.includes('failed') || data.dnsCheck.includes('SERVFAIL'))) {
+    findings.push('WARNING: DNS resolution issues detected - may affect OpenRouter API calls');
+  }
+  
+  // RULE 20: No extensions installed
+  if (data.extensionCount === 0 && data.openclawInstalled) {
+    findings.push('INFO: No extensions installed - OpenClaw is using default configuration');
+  }
+  
+  // RULE 21: No skills installed
+  if (data.skillCount === 0 && data.openclawInstalled) {
+    findings.push('INFO: No skills installed - consider adding skills for enhanced functionality');
+  }
+  
+  // RULE 22: Many extensions (performance check)
+  if (data.extensionCount && data.extensionCount > 20) {
+    findings.push('INFO: ' + data.extensionCount + ' extensions installed - may impact startup time');
+  }
+  
   // Build diagnosis
   const diagnosis: DiagnosisResult = buildDiagnosis(findings, critical, data);
   

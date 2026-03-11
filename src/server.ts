@@ -4,6 +4,7 @@ import { observe } from './observe';
 import { diagnose } from './diagnose';
 import { execute } from './execute';
 import { verify } from './verify';
+import { generateReport, saveReport, getRecentReports, exportReportAsMarkdown } from './report';
 
 export async function startServer(port: number): Promise<void> {
   const app = express();
@@ -65,6 +66,42 @@ export async function startServer(port: number): Promise<void> {
       const verification = await verify(sendProgress);
       
       res.json({ success: result.success, verification });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+  
+  // Export report endpoint
+  app.post('/api/export', async (req, res) => {
+    try {
+      const { observation, diagnosis } = req.body;
+      const report = generateReport(observation, diagnosis);
+      const filepath = saveReport(report);
+      res.json({ success: true, filepath });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+  
+  // Get recent reports
+  app.get('/api/reports', async (req, res) => {
+    try {
+      const reports = getRecentReports(10);
+      res.json({ success: true, reports });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+  
+  // Export report as markdown
+  app.post('/api/export/markdown', async (req, res) => {
+    try {
+      const { observation, diagnosis } = req.body;
+      const report = generateReport(observation, diagnosis);
+      const markdown = exportReportAsMarkdown(report);
+      res.setHeader('Content-Type', 'text/markdown');
+      res.setHeader('Content-Disposition', 'attachment; filename="clawdoctor-report.md"');
+      res.send(markdown);
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });
     }

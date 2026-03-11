@@ -55,9 +55,17 @@
           <div id="options-container"></div>
         </div>
 
-        <button onclick="location.reload()" class="btn-secondary">
-          🔄 Scan Again
-        </button>
+        <div class="action-buttons">
+          <button onclick="location.reload()" class="btn-secondary">
+            🔄 Scan Again
+          </button>
+          <button id="export-btn" class="btn-secondary">
+            💾 Export Report
+          </button>
+          <button id="export-md-btn" class="btn-secondary">
+            📄 Download Markdown
+          </button>
+        </div>
       </div>
 
       <div id="error-section" class="section hidden">

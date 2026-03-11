@@ -1,7 +1,21 @@
+// Global state
+let currentObservation = null;
+let currentDiagnosis = null;
+
 // Wait for user action instead of auto-starting
 window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('diagnose-btn').addEventListener('click', () => startDiagnosis(false));
   document.getElementById('scan-fix-btn').addEventListener('click', () => startDiagnosis(true));
+  
+  // Load recent reports count
+  fetch('/api/reports')
+    .then(r => r.json())
+    .then(data => {
+      if (data.success && data.reports.length > 0) {
+        showReportsHint(data.reports.length);
+      }
+    })
+    .catch(() => {});
 });
 
 function startDiagnosis(autoFix = false) {
@@ -19,7 +33,12 @@ function startDiagnosis(autoFix = false) {
       
       case 'diagnosis':
         eventSource.close();
+        currentDiagnosis = data.data;
         showDiagnosis(data.data, autoFix);
+        break;
+      
+      case 'observation':
+        currentObservation = data.data;
         break;
       
       case 'complete':
@@ -208,4 +227,64 @@ function showComplete(success) {
 function showError(message) {
   showSection('error');
   document.getElementById('error-text').textContent = message;
+}
+
+function setupExportButtons(observation, diagnosis) {
+  currentObservation = observation;
+  currentDiagnosis = diagnosis;
+  
+  const exportBtn = document.getElementById('export-btn');
+  const exportMdBtn = document.getElementById('export-md-btn');
+  
+  if (exportBtn) {
+    exportBtn.onclick = async () => {
+      try {
+        const response = await fetch('/api/export', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ observation, diagnosis })
+        });
+        const result = await response.json();
+        if (result.success) {
+          alert(`✅ Report saved to:\n${result.filepath}`);
+        } else {
+          alert('❌ Failed to save report');
+        }
+      } catch (error) {
+        alert('❌ Error: ' + error.message);
+      }
+    };
+  }
+  
+  if (exportMdBtn) {
+    exportMdBtn.onclick = async () => {
+      try {
+        const response = await fetch('/api/export/markdown', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ observation, diagnosis })
+        });
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'clawdoctor-report.md';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      } catch (error) {
+        alert('❌ Error: ' + error.message);
+      }
+    };
+  }
+}
+
+function showReportsHint(count) {
+  const hint = document.createElement('div');
+  hint.className = 'reports-hint';
+  hint.innerHTML = `📋 ${count} previous diagnostic report${count > 1 ? 's' : ''} saved`;
+  hint.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#667eea;color:white;padding:12px 20px;border-radius:8px;font-size:0.9em;box-shadow:0 4px 12px rgba(0,0,0,0.2);cursor:pointer;';
+  hint.onclick = () => window.open('file://' + require('os').homedir() + '/.openclaw/clawdoctor-reports', '_blank');
+  document.body.appendChild(hint);
 }

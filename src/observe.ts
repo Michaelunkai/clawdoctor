@@ -27,6 +27,10 @@ export interface ObservationData {
   permissions: string;
   launchAgent?: string; // macOS only
   windowsService?: string; // Windows only
+  networkCheck?: string;
+  dnsCheck?: string;
+  extensionCount?: number;
+  skillCount?: number;
 }
 
 function safeExec(command: string, silent: boolean = false): string {
@@ -131,6 +135,24 @@ export async function observe(onProgress?: (msg: string) => void): Promise<Obser
     ? safeExec('tasklist | findstr node', true)
     : safeExec('ps aux | grep -i openclaw | grep -v grep', true);
   
+  log('Checking network connectivity...');
+  const networkCheck = safeExec(platform === 'win32' ? 'ping -n 1 8.8.8.8' : 'ping -c 1 8.8.8.8', true);
+  
+  log('Checking DNS resolution...');
+  const dnsCheck = safeExec(platform === 'win32' ? 'nslookup google.com' : 'nslookup google.com', true);
+  
+  log('Checking OpenClaw extensions...');
+  const extensionsDir = path.join(os.homedir(), '.openclaw', 'extensions');
+  const extensionCount = fs.existsSync(extensionsDir) 
+    ? fs.readdirSync(extensionsDir).filter(f => fs.statSync(path.join(extensionsDir, f)).isDirectory()).length
+    : 0;
+  
+  log('Checking OpenClaw skills...');
+  const skillsDir = path.join(os.homedir(), '.openclaw', 'skills');
+  const skillCount = fs.existsSync(skillsDir)
+    ? fs.readdirSync(skillsDir).filter(f => fs.statSync(path.join(skillsDir, f)).isDirectory()).length
+    : 0;
+  
   log('Checking disk space...');
   const diskSpace = platform === 'win32'
     ? safeExec('wmic logicaldisk get caption,freespace,size', true)
@@ -202,6 +224,10 @@ export async function observe(onProgress?: (msg: string) => void): Promise<Obser
     openclawInstalled,
     permissions,
     launchAgent,
-    windowsService
+    windowsService,
+    networkCheck,
+    dnsCheck,
+    extensionCount,
+    skillCount
   };
 }

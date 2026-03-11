@@ -314,6 +314,31 @@ button:disabled {
   flex-wrap: wrap;
 }
 
+.action-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.github-link {
+  display: inline-block;
+  background: #24292e;
+  color: white;
+  padding: 12px 30px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.github-link:hover {
+  background: #1a1f23;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
 .github-link {
   display: inline-block;
   margin-top: 20px;
