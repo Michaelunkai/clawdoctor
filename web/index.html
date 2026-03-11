@@ -26,6 +26,31 @@
       <div id="start-section" class="section">
         <div class="start-content">
           <p class="intro">Check your OpenClaw installation for issues and get automatic fixes.</p>
+          
+          <!-- Quick Stats Dashboard -->
+          <div id="quick-stats" class="stats-dashboard">
+            <div class="stat-card">
+              <div class="stat-icon">💻</div>
+              <div class="stat-value" id="stat-rules">40</div>
+              <div class="stat-label">Diagnostic Rules</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">🆓</div>
+              <div class="stat-value">$0</div>
+              <div class="stat-label">Cost (vs $1.99)</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">⚡</div>
+              <div class="stat-value" id="stat-speed">~5s</div>
+              <div class="stat-label">Scan Speed</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">🔒</div>
+              <div class="stat-value">100%</div>
+              <div class="stat-label">Safe Fixes</div>
+            </div>
+          </div>
+          
           <div class="button-group">
             <button id="diagnose-btn" class="btn-primary">
               🔍 Diagnose
@@ -46,6 +71,27 @@
         <div class="progress-bar">
           <div class="progress-fill"></div>
         </div>
+        
+        <!-- Live System Metrics -->
+        <div id="system-metrics" class="metrics-grid">
+          <div class="metric-item">
+            <span class="metric-label">CPU:</span>
+            <span class="metric-value" id="metric-cpu">--</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">Memory:</span>
+            <span class="metric-value" id="metric-memory">--</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">Extensions:</span>
+            <span class="metric-value" id="metric-extensions">--</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">Network:</span>
+            <span class="metric-value" id="metric-network">--</span>
+          </div>
+        </div>
+        
         <div id="progress-log"></div>
       </div>
 

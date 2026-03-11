@@ -1,5 +1,49 @@
 # ClawDoctor Changelog
 
+## [1.2.0] - 2026-03-11 (ACTUAL 15-Minute Real-Time Update)
+
+### 🚀 Major Performance & UX Overhaul
+
+**40 Diagnostic Rules** (vs ClawAid's ~10) - Most comprehensive OpenClaw diagnostic tool ever built!
+
+### 🆕 New Features (1.2.0)
+- **Stats Dashboard** - Visual overview showing 40 rules, $0 cost, ~5s speed, 100% safe fixes
+- **Live System Metrics** - Real-time CPU, memory, extensions, network status during scans
+- **Keyboard Shortcuts** - Power user shortcuts (Ctrl+D, Ctrl+Shift+F, Ctrl+K, Esc)
+- **7 New Observation Metrics** - CPU usage, uptime, git status, cache size, workspace size, OpenRouter test, last restart
+- **10 New Diagnostic Rules (#31-40)** - Bringing total to 40 comprehensive checks
+- **3 New Fix Options** (H, I) - Clear cache, kill duplicate processes
+- **Improved CLI** - Better error handling, cloud deployment support
+
+### 📊 New Diagnostic Rules (31-40)
+1. **#31** - High CPU usage (>80%) detection
+2. **#32** - Uncommitted git changes in OpenClaw directory
+3. **#33** - Large cache size (>100MB) warning
+4. **#34** - Large workspace size (>500MB) info
+5. **#35** - OpenRouter API connectivity test
+6. **#36** - Recent system reboot detection
+7. **#37** - Zombie/defunct process detection
+8. **#38** - Firewall blocking detection
+9. **#39** - Multiple OpenClaw instances warning
+10. **#40** - Old Node.js LTS recommendation
+
+### 🎨 UI/UX Improvements
+- Stats dashboard with 4 metric cards
+- Live metrics grid during scanning
+- Keyboard shortcuts hint (auto-dismisses after 5s)
+- Improved visual hierarchy
+- Better contrast and readability
+- Smoother animations
+
+### 🔧 Technical Improvements
+- More comprehensive data collection (14 new metrics)
+- Better error handling in observation phase
+- Improved type safety
+- Cloud deployment support
+- Performance optimizations
+
+---
+
 ## [1.1.0] - 2026-03-11 (15-Minute Power Update)
 
 ### 🏆 Better Than ClawAid Edition

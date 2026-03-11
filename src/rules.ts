@@ -210,6 +210,70 @@ export function applyRules(data: ObservationData): RuleResult {
     critical = true;
   }
   
+  // RULE 31: High CPU usage
+  if (data.cpuUsage) {
+    const cpuMatch = data.cpuUsage.match(/(\d+)/);
+    if (cpuMatch && parseInt(cpuMatch[1]) > 80) {
+      findings.push('WARNING: High CPU usage detected (' + cpuMatch[1] + '%) - may affect performance');
+    }
+  }
+  
+  // RULE 32: Uncommitted changes in OpenClaw directory
+  if (data.gitStatus && data.gitStatus.length > 0 && !data.gitStatus.includes('Not a git')) {
+    findings.push('INFO: Uncommitted changes detected in OpenClaw directory');
+  }
+  
+  // RULE 33: Large cache size (>100MB)
+  if (data.cacheSize && data.cacheSize > 100 * 1024 * 1024) {
+    const sizeMB = Math.round(data.cacheSize / (1024 * 1024));
+    findings.push('WARNING: Cache size is large (' + sizeMB + 'MB) - consider clearing cache');
+  }
+  
+  // RULE 34: Large workspace size (>500MB)
+  if (data.workspaceSize && data.workspaceSize > 500 * 1024 * 1024) {
+    const sizeMB = Math.round(data.workspaceSize / (1024 * 1024));
+    findings.push('INFO: Workspace size is large (' + sizeMB + 'MB) - consider cleanup');
+  }
+  
+  // RULE 35: OpenRouter API connectivity
+  if (data.openrouterTest && data.openrouterTest !== '200') {
+    findings.push('WARNING: OpenRouter API connection failed (HTTP ' + data.openrouterTest + ') - AI diagnosis may not work');
+  }
+  
+  // RULE 36: Recent system uptime (possible reboot loop)
+  if (data.systemUptime && data.systemUptime.match(/\d+\s+min/)) {
+    findings.push('WARNING: System recently rebooted - check for stability issues');
+  }
+  
+  // RULE 37: Check for orphaned node processes
+  if (data.processCheck) {
+    const zombieCheck = data.processCheck.toLowerCase();
+    if (zombieCheck.includes('defunct') || zombieCheck.includes('<defunct>')) {
+      findings.push('WARNING: Zombie/defunct processes detected - may indicate process management issues');
+    }
+  }
+  
+  // RULE 38: Check for firewall blocking
+  if (data.portCheck && data.portCheck.includes('filtered')) {
+    findings.push('WARNING: Port 18789 appears to be filtered by firewall');
+  }
+  
+  // RULE 39: Check for multiple OpenClaw instances
+  if (data.processCheck) {
+    const openclawProcesses = data.processCheck.split('\n').filter(l => 
+      l.toLowerCase().includes('openclaw') && !l.includes('grep')
+    );
+    if (openclawProcesses.length > 3) {
+      findings.push('WARNING: Multiple OpenClaw processes detected (' + openclawProcesses.length + ') - possible duplicate instances');
+    }
+  }
+  
+  // RULE 40: Check for old Node.js LTS
+  const nodeMajor = parseInt(data.nodeVersion.match(/v(\d+)/)![1]);
+  if (nodeMajor === 18 || nodeMajor === 20) {
+    findings.push('INFO: Consider upgrading to latest Node.js LTS (currently v' + nodeMajor + ')');
+  }
+  
   // Build diagnosis
   const diagnosis: DiagnosisResult = buildDiagnosis(findings, critical, data);
   

@@ -65,6 +65,61 @@ window.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem('clawdoctor-seen-comparison', 'true');
     }, 2000);
   }
+  
+  // Keyboard shortcuts
+  document.addEventListener('keydown', (e) => {
+    // Ctrl/Cmd + D = Diagnose
+    if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+      e.preventDefault();
+      const diagnoseBtn = document.getElementById('diagnose-btn');
+      if (diagnoseBtn && !diagnoseBtn.disabled) {
+        startDiagnosis(false);
+      }
+    }
+    
+    // Ctrl/Cmd + Shift + F = Scan & Fix
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'F') {
+      e.preventDefault();
+      const fixBtn = document.getElementById('scan-fix-btn');
+      if (fixBtn && !fixBtn.disabled) {
+        startDiagnosis(true);
+      }
+    }
+    
+    // Escape = Close modal
+    if (e.key === 'Escape') {
+      const modal = document.getElementById('comparison-modal');
+      if (modal && !modal.classList.contains('hidden')) {
+        modal.classList.add('hidden');
+      }
+    }
+    
+    // Ctrl/Cmd + K = Toggle dark mode
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault();
+      document.getElementById('theme-toggle').click();
+    }
+  });
+  
+  // Show keyboard shortcuts hint
+  const shortcutsHint = document.createElement('div');
+  shortcutsHint.className = 'shortcuts-hint';
+  shortcutsHint.innerHTML = `
+    <div class="hint-title">⌨️ Keyboard Shortcuts</div>
+    <div class="hint-item"><kbd>Ctrl+D</kbd> Diagnose</div>
+    <div class="hint-item"><kbd>Ctrl+Shift+F</kbd> Scan & Fix</div>
+    <div class="hint-item"><kbd>Ctrl+K</kbd> Dark Mode</div>
+    <div class="hint-item"><kbd>Esc</kbd> Close Modal</div>
+  `;
+  shortcutsHint.style.cssText = 'position:fixed;bottom:20px;left:20px;background:var(--container-bg);padding:15px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.2);font-size:0.85em;opacity:0.9;';
+  document.body.appendChild(shortcutsHint);
+  
+  // Hide shortcuts hint after 5 seconds
+  setTimeout(() => {
+    shortcutsHint.style.opacity = '0';
+    shortcutsHint.style.transition = 'opacity 0.5s';
+    setTimeout(() => shortcutsHint.remove(), 500);
+  }, 5000);
 });
 
 function startDiagnosis(autoFix = false) {

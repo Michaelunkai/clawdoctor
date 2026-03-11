@@ -31,6 +31,13 @@ export interface ObservationData {
   dnsCheck?: string;
   extensionCount?: number;
   skillCount?: number;
+  cpuUsage?: string;
+  systemUptime?: string;
+  gitStatus?: string;
+  cacheSize?: number;
+  workspaceSize?: number;
+  openrouterTest?: string;
+  lastGatewayRestart?: string;
 }
 
 function safeExec(command: string, silent: boolean = false): string {
@@ -199,6 +206,87 @@ export async function observe(onProgress?: (msg: string) => void): Promise<Obser
     windowsService = safeExec('sc query openclaw', true);
   }
   
+  log('Checking CPU usage...');
+  const cpuUsage = platform === 'win32'
+    ? safeExec('wmic cpu get loadpercentage', true)
+    : safeExec('top -bn1 | grep "Cpu(s)"', true);
+  
+  log('Checking system uptime...');
+  const systemUptime = platform === 'win32'
+    ? safeExec('net statistics workstation | findstr "Statistics"', true)
+    : safeExec('uptime -p', true);
+  
+  log('Checking OpenClaw git status...');
+  const openclawGitDir = path.join(os.homedir(), '.openclaw');
+  const gitStatus = fs.existsSync(path.join(openclawGitDir, '.git'))
+    ? safeExec(`git -C "${openclawGitDir}" status --short`, true)
+    : 'Not a git repository';
+  
+  log('Checking cache size...');
+  const cacheDir = path.join(os.homedir(), '.openclaw', 'cache');
+  let cacheSize = 0;
+  if (fs.existsSync(cacheDir)) {
+    try {
+      const getCacheSize = (dir: string): number => {
+        let size = 0;
+        const files = fs.readdirSync(dir);
+        files.forEach(file => {
+          const filePath = path.join(dir, file);
+          const stats = fs.statSync(filePath);
+          if (stats.isFile()) {
+            size += stats.size;
+          } else if (stats.isDirectory()) {
+            size += getCacheSize(filePath);
+          }
+        });
+        return size;
+      };
+      cacheSize = getCacheSize(cacheDir);
+    } catch {}
+  }
+  
+  log('Checking workspace size...');
+  const workspaceDir = path.join(os.homedir(), '.openclaw', 'workspace-openclaw');
+  let workspaceSize = 0;
+  if (fs.existsSync(workspaceDir)) {
+    try {
+      const getDirSize = (dir: string): number => {
+        let size = 0;
+        const files = fs.readdirSync(dir);
+        files.forEach(file => {
+          const filePath = path.join(dir, file);
+          try {
+            const stats = fs.statSync(filePath);
+            if (stats.isFile()) {
+              size += stats.size;
+            }
+          } catch {}
+        });
+        return size;
+      };
+      workspaceSize = getDirSize(workspaceDir);
+    } catch {}
+  }
+  
+  log('Testing OpenRouter API connection...');
+  const openrouterTest = safeExec('curl -s -o /dev/null -w "%{http_code}" --max-time 5 https://openrouter.ai', true);
+  
+  log('Checking last gateway restart...');
+  const gatewayLogFiles = fs.existsSync(logDir) 
+    ? fs.readdirSync(logDir).filter(f => f.startsWith('openclaw-')).sort().reverse()
+    : [];
+  let lastGatewayRestart = 'Unknown';
+  if (gatewayLogFiles.length > 0) {
+    const latestLog = path.join(logDir, gatewayLogFiles[0]);
+    try {
+      const logs = fs.readFileSync(latestLog, 'utf-8');
+      const restartMatch = logs.match(/gateway.*start/i);
+      if (restartMatch) {
+        lastGatewayRestart = 'Recently (check logs for exact time)';
+      }
+    } catch {}
+  }
+  
   log('✅ Data collection complete');
   
   return {
@@ -228,6 +316,13 @@ export async function observe(onProgress?: (msg: string) => void): Promise<Obser
     networkCheck,
     dnsCheck,
     extensionCount,
-    skillCount
+    skillCount,
+    cpuUsage,
+    systemUptime,
+    gitStatus,
+    cacheSize,
+    workspaceSize,
+    openrouterTest,
+    lastGatewayRestart
   };
 }

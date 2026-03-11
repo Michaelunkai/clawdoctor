@@ -101,6 +101,108 @@ header {
   color: #764ba2;
 }
 
+/* Stats Dashboard */
+.stats-dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin: 30px 0;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, rgba(102,126,234,0.1) 0%, rgba(118,75,162,0.1) 100%);
+  border: 2px solid rgba(102,126,234,0.3);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(102,126,234,0.3);
+  border-color: #667eea;
+}
+
+.stat-icon {
+  font-size: 2em;
+  margin-bottom: 10px;
+}
+
+.stat-value {
+  font-size: 2em;
+  font-weight: bold;
+  color: #667eea;
+  margin: 5px 0;
+}
+
+.stat-label {
+  font-size: 0.85em;
+  color: var(--text-light, #666);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Live Metrics */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+  padding: 20px;
+  background: rgba(102,126,234,0.05);
+  border-radius: 8px;
+}
+
+.metric-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  background: var(--container-bg);
+  border-radius: 6px;
+  border-left: 3px solid #667eea;
+}
+
+.metric-label {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.metric-value {
+  font-family: 'Courier New', monospace;
+  color: #4caf50;
+  font-weight: bold;
+}
+
+/* Keyboard Shortcuts */
+.shortcuts-hint {
+  z-index: 999;
+}
+
+.hint-title {
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #667eea;
+}
+
+.hint-item {
+  margin: 5px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+kbd {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
 h1 {
   font-size: 3em;
   color: #667eea;
