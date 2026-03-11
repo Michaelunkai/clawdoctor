@@ -207,38 +207,111 @@ h1 {
 
 .option-steps {
   margin-top: 15px;
+  background: #f8f8f8;
+  padding: 15px;
+  border-radius: 8px;
 }
 
-.step {
-  background: white;
-  padding: 10px;
-  border-radius: 4px;
-  margin: 8px 0;
-  font-family: 'Courier New', monospace;
-  font-size: 0.9em;
-  color: #333;
+.start-content {
+  text-align: center;
+  padding: 40px 20px;
 }
 
-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+.intro {
+  font-size: 1.2em;
+  color: #555;
+  margin-bottom: 30px;
+}
+
+.button-group {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.description {
+  color: #777;
+  font-size: 0.95em;
+  line-height: 1.8;
+  margin-top: 20px;
+}
+
+button, .btn-primary, .btn-success, .btn-secondary {
   border: none;
-  padding: 12px 30px;
+  padding: 15px 40px;
   border-radius: 8px;
   font-size: 1.1em;
   font-weight: bold;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: all 0.2s;
   margin-top: 10px;
 }
 
-button:hover {
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+  color: white;
+}
+
+.btn-secondary {
+  background: #f0f0f0;
+  color: #333;
+  border: 2px solid #ddd;
+}
+
+button:hover, .btn-primary:hover, .btn-success:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102,126,234,0.4);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+.btn-secondary:hover {
+  background: #e0e0e0;
+  border-color: #ccc;
 }
 
 button:active {
   transform: translateY(0);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.steps-title {
+  font-weight: bold;
+  color: #667eea;
+  margin-bottom: 10px;
+  font-size: 1em;
+}
+
+.step {
+  background: white;
+  padding: 12px;
+  border-radius: 4px;
+  margin: 8px 0;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.step-icon {
+  color: #667eea;
+  font-size: 0.8em;
+}
+
+.final-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 20px;
+  flex-wrap: wrap;
 }
 
 .github-link {

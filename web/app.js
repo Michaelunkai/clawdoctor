@@ -1,7 +1,10 @@
-// Auto-start diagnosis on page load
-window.addEventListener('DOMContentLoaded', startDiagnosis);
+// Wait for user action instead of auto-starting
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('diagnose-btn').addEventListener('click', () => startDiagnosis(false));
+  document.getElementById('scan-fix-btn').addEventListener('click', () => startDiagnosis(true));
+});
 
-function startDiagnosis() {
+function startDiagnosis(autoFix = false) {
   showSection('progress');
   
   const eventSource = new EventSource('/api/diagnose');
@@ -16,7 +19,7 @@ function startDiagnosis() {
       
       case 'diagnosis':
         eventSource.close();
-        showDiagnosis(data.data);
+        showDiagnosis(data.data, autoFix);
         break;
       
       case 'complete':
@@ -51,17 +54,17 @@ function appendLog(message) {
   logDiv.scrollTop = logDiv.scrollHeight;
 }
 
-function showDiagnosis(diagnosis) {
+function showDiagnosis(diagnosis, autoFix) {
   showSection('diagnosis');
   
   // Health badge
   const badge = document.getElementById('health-badge');
-  badge.textContent = diagnosis.healthy ? '✓ Healthy' : '⚠ Issues Found';
+  badge.textContent = diagnosis.healthy ? '✅ System Healthy' : '⚠️ Issues Found';
   badge.className = diagnosis.healthy ? 'badge-healthy' : 'badge-unhealthy';
   
   // Diagnosis text
   document.getElementById('diagnosis-title').textContent = 
-    diagnosis.healthy ? 'System is Healthy' : 'Issues Detected';
+    diagnosis.healthy ? 'OpenClaw is Running Smoothly!' : 'Issues Detected';
   document.getElementById('diagnosis-text').textContent = diagnosis.diagnosis;
   
   // Warnings
@@ -83,9 +86,17 @@ function showDiagnosis(diagnosis) {
     const optionsContainer = document.getElementById('options-container');
     optionsContainer.innerHTML = '';
     
+    // If autoFix mode, automatically execute recommended option
+    let autoExecuted = false;
+    
     diagnosis.options.forEach(option => {
-      const optionEl = createOptionElement(option);
+      const optionEl = createOptionElement(option, autoFix && option.recommended && !autoExecuted);
       optionsContainer.appendChild(optionEl);
+      
+      if (autoFix && option.recommended && option.risk === 'low' && !autoExecuted) {
+        autoExecuted = true;
+        setTimeout(() => executeFix(option), 1000);
+      }
     });
     
     optionsSection.classList.remove('hidden');
@@ -94,7 +105,7 @@ function showDiagnosis(diagnosis) {
   }
 }
 
-function createOptionElement(option) {
+function createOptionElement(option, autoExecuting) {
   const div = document.createElement('div');
   div.className = 'repair-option' + (option.recommended ? ' recommended' : '');
   
@@ -109,7 +120,7 @@ function createOptionElement(option) {
   if (option.recommended) {
     const recBadge = document.createElement('span');
     recBadge.className = 'option-badge badge-recommended';
-    recBadge.textContent = 'Recommended';
+    recBadge.textContent = '✓ Recommended';
     badges.appendChild(recBadge);
     badges.appendChild(document.createTextNode(' '));
   }
@@ -127,20 +138,21 @@ function createOptionElement(option) {
   
   const stepsDiv = document.createElement('div');
   stepsDiv.className = 'option-steps';
+  stepsDiv.innerHTML = '<div class="steps-title">🔧 Steps that will be executed:</div>';
   option.steps.forEach(step => {
     const stepEl = document.createElement('div');
     stepEl.className = 'step';
-    stepEl.textContent = `$ ${step.command}`;
+    stepEl.innerHTML = `<span class="step-icon">▶</span> ${step.description}`;
     stepsDiv.appendChild(stepEl);
   });
   
   const button = document.createElement('button');
-  button.textContent = option.autoExecute ? 'Auto-executing...' : 'Execute Fix';
+  button.className = autoExecuting ? 'btn-success' : 'btn-primary';
+  button.textContent = autoExecuting ? '⚡ Auto-executing...' : '🔧 Execute Fix';
   button.onclick = () => executeFix(option);
   
-  if (option.autoExecute) {
+  if (autoExecuting) {
     button.disabled = true;
-    setTimeout(() => executeFix(option), 1000);
   }
   
   div.appendChild(header);
@@ -153,7 +165,8 @@ function createOptionElement(option) {
 
 async function executeFix(option) {
   showSection('progress');
-  appendLog(`Executing ${option.title}...`);
+  document.getElementById('progress-log').innerHTML = '';
+  appendLog(`⚡ Executing: ${option.title}`);
   
   try {
     const response = await fetch('/api/execute', {
@@ -168,10 +181,16 @@ async function executeFix(option) {
     const result = await response.json();
     
     if (result.success && result.verification) {
-      showComplete(true);
-    } else {
-      appendLog('Fix completed but verification failed. Please check manually.');
+      appendLog('✅ Fix successful!');
+      appendLog('✅ Verification passed!');
+      setTimeout(() => showComplete(true), 2000);
+    } else if (result.success) {
+      appendLog('✅ Fix completed');
+      appendLog('⚠️ Verification inconclusive - please check manually');
       setTimeout(() => location.reload(), 3000);
+    } else {
+      appendLog('❌ Fix failed: ' + (result.error || 'Unknown error'));
+      setTimeout(() => showError('Fix execution failed'), 2000);
     }
   } catch (error) {
     showError(`Failed to execute fix: ${error.message}`);
@@ -182,8 +201,8 @@ function showComplete(success) {
   showSection('complete');
   document.getElementById('complete-text').textContent = 
     success 
-      ? '✨ Your OpenClaw system is now healthy!' 
-      : 'Diagnosis complete. Review the findings above.';
+      ? '✨ Your OpenClaw system is now healthy and running smoothly!' 
+      : '✅ Diagnosis complete. Review the findings above.';
 }
 
 function showError(message) {

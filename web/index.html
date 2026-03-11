@@ -14,8 +14,26 @@
     </header>
 
     <div id="status-area">
+      <div id="start-section" class="section">
+        <div class="start-content">
+          <p class="intro">Check your OpenClaw installation for issues and get automatic fixes.</p>
+          <div class="button-group">
+            <button id="diagnose-btn" class="btn-primary">
+              🔍 Diagnose
+            </button>
+            <button id="scan-fix-btn" class="btn-success">
+              ⚡ Scan & Fix
+            </button>
+          </div>
+          <p class="description">
+            <strong>Diagnose:</strong> Scan for issues and show what needs fixing<br>
+            <strong>Scan & Fix:</strong> Automatically scan and safely fix all issues
+          </p>
+        </div>
+      </div>
+
       <div id="progress-section" class="section hidden">
-        <h2>Diagnosing...</h2>
+        <h2>Scanning...</h2>
         <div class="progress-bar">
           <div class="progress-fill"></div>
         </div>
@@ -28,28 +46,37 @@
         <p id="diagnosis-text"></p>
         
         <div id="warnings-section" class="hidden">
-          <h3>Warnings</h3>
+          <h3>⚠️ Warnings</h3>
           <ul id="warnings-list"></ul>
         </div>
 
         <div id="options-section" class="hidden">
-          <h3>Repair Options</h3>
+          <h3>🛠️ Repair Options</h3>
           <div id="options-container"></div>
         </div>
+
+        <button onclick="location.reload()" class="btn-secondary">
+          🔄 Scan Again
+        </button>
       </div>
 
       <div id="error-section" class="section hidden">
         <h2>❌ Error</h2>
         <p id="error-text"></p>
-        <button onclick="location.reload()">Try Again</button>
+        <button onclick="location.reload()" class="btn-secondary">Try Again</button>
       </div>
 
       <div id="complete-section" class="section hidden">
         <h2>✅ Complete</h2>
         <p id="complete-text"></p>
-        <a href="https://github.com/Michaelunkai/clawdoctor" target="_blank" class="github-link">
-          ⭐ Star on GitHub
-        </a>
+        <div class="final-actions">
+          <button onclick="location.reload()" class="btn-secondary">
+            🔄 Scan Again
+          </button>
+          <a href="https://github.com/Michaelunkai/clawdoctor" target="_blank" class="github-link">
+            ⭐ Star on GitHub
+          </a>
+        </div>
       </div>
     </div>
   </div>

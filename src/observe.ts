@@ -86,8 +86,8 @@ export async function observe(onProgress?: (msg: string) => void): Promise<Obser
   
   log('Checking port 18789...');
   const portCheck = platform === 'win32' 
-    ? safeExec('netstat -ano | findstr :18789', true)
-    : safeExec('lsof -i :18789', true);
+    ? safeExec('netstat -ano | findstr ":18789"', true)
+    : safeExec('lsof -i :18789 2>/dev/null', true);
   
   log('Checking openclaw processes...');
   const processCheck = platform === 'win32'

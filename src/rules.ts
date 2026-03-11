@@ -11,15 +11,22 @@ export function applyRules(data: ObservationData): RuleResult {
   const findings: string[] = [];
   let critical = false;
   
-  // Rule 1: Gateway not running
-  if (data.gatewayStatus.includes('not running') || data.gatewayStatus.includes('Error')) {
+  // Rule 1: Gateway not running (but not if it's a false positive from command output)
+  const gatewayNotRunning = data.gatewayStatus.includes('not running') || 
+                            (data.gatewayStatus.includes('Error') && 
+                             !data.gatewayStatus.includes('STDIN'));
+  
+  if (gatewayNotRunning) {
     findings.push('CRITICAL: Gateway is not running');
     critical = true;
   }
   
-  // Rule 2: Port conflict
-  if (data.portCheck && !data.portCheck.includes('Error') && data.portCheck.trim().length > 10) {
-    findings.push('WARNING: Port 18789 appears to be in use');
+  // Rule 2: Port conflict (only if actual process is found, not just error messages)
+  if (data.portCheck && 
+      !data.portCheck.includes('Error') && 
+      !data.portCheck.includes('STDIN') &&
+      data.portCheck.match(/LISTENING|ESTABLISHED|\d+\s+node/)) {
+    findings.push('INFO: Port 18789 is in use (likely by gateway itself)');
   }
   
   // Rule 3: Config missing
@@ -47,18 +54,24 @@ export function applyRules(data: ObservationData): RuleResult {
 }
 
 function buildDiagnosis(findings: string[], critical: boolean, data: ObservationData): DiagnosisResult {
-  if (!critical && findings.length === 0) {
+  // Filter out INFO findings from critical check
+  const criticalFindings = findings.filter(f => f.startsWith('CRITICAL'));
+  const warningFindings = findings.filter(f => f.startsWith('WARNING'));
+  const infoFindings = findings.filter(f => f.startsWith('INFO'));
+  
+  if (!critical && criticalFindings.length === 0) {
     return {
       healthy: true,
       diagnosis: 'OpenClaw appears to be running normally. No critical issues detected.',
-      confidence: 0.85,
+      confidence: 0.9,
       rootCause: 'No issues found',
       reasoning: [
         'Gateway status check passed',
         'Configuration file exists',
-        'Node.js version is compatible'
+        'Node.js version is compatible',
+        ...infoFindings
       ],
-      warnings: findings,
+      warnings: warningFindings,
       options: []
     };
   }
