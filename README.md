@@ -1,226 +1,164 @@
-# 🦞 ClawDoctor
+# 🦞 ClawDoctor v2.0.0
 
-**100% Free AI-Powered OpenClaw Diagnostics & Repair Tool**
+**100% Free OpenClaw Diagnostics & Repair Tool**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js Version](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org/)
+ClawDoctor automatically diagnoses and fixes OpenClaw issues with a beautiful, user-friendly interface.
 
----
+## ✨ What's Fixed in v2.0.0
+
+### 1️⃣ **Useful Output** (No More Garbage)
+- Clean, filtered logs showing only warnings and errors
+- No verbose startup noise
+- Human-readable messages
+- Truncated long errors
+
+### 2️⃣ **Real Fixes** (19 Diagnostic Checks)
+- memory-context-bridge config cleanup
+- Gateway startup automation
+- Config initialization & repair
+- Node.js version checking
+- npm upgrade recommendations
+- DNS & network diagnostics
+- Hook loading error detection
+- Permission fixes
+- And 11 more checks!
+
+### 3️⃣ **Beautiful UI** (Like ClawAid)
+- Dark theme (#0a0a0a background)
+- Clean, minimal design
+- Emoji scan steps
+- Color-coded severity
+- Fix summary with counts
+- Smooth animations
 
 ## 🚀 Quick Start
 
 ```bash
-npx clawdoctor
-```
-
-Opens a clean web UI with two powerful buttons:
-
-### 🔍 **Diagnose Button**
-- Scans your entire OpenClaw setup
-- Shows human-readable results
-- Lists all detected issues
-- Provides step-by-step fix options
-- You choose what to fix
-
-### ⚡ **Scan & Fix Button** 
-- Automatically scans your system
-- Finds all issues
-- **Auto-executes low-risk fixes**
-- Only safe fixes (no data loss)
-- Verifies fixes worked
-
-**Choose your style:** Manual control (Diagnose) or full automation (Scan & Fix)!
-
----
-
-## ✨ Features
-
-- **100% Free** - No paywalls, no subscriptions, no hidden costs
-- **AI-Powered** - Uses OpenRouter API (auto-detects your existing OpenClaw API key)
-- **Rule-Based Fallback** - Works even without AI, using deterministic diagnostics
-- **Auto-Fix** - One-click repairs for common issues
-- **Real-Time Progress** - See exactly what's happening via SSE streaming
-- **Zero Config** - Just run it, no setup needed
-
----
-
-## 🔍 What It Checks (22 Diagnostic Rules)
-
-### Critical Issues:
-✅ OpenClaw installation status  
-✅ Gateway running state  
-✅ Config file exists & valid JSON  
-✅ Node.js version (v18+ required)  
-✅ File permissions on .openclaw directory  
-✅ CLI commands accessible in PATH  
-
-### Warnings:
-✅ Port conflicts (18789)  
-✅ Doctor-detected issues  
-✅ Error logs presence  
-✅ Low disk space  
-✅ LaunchAgent missing (macOS)  
-✅ npm version outdated  
-✅ Version mismatches  
-✅ Missing package.json  
-
-### Info:
-✅ Proxy environment variables  
-✅ Memory usage  
-✅ Process status  
-✅ Recent log analysis  
-✅ Network connectivity  
-✅ DNS resolution  
-✅ Extensions count  
-✅ Skills count  
-
-## 🛡️ Safety Features
-
-### Automatic Backups
-- **Config file backup** before any changes
-- Stored in `~/.openclaw/clawdoctor-backups`
-- Keeps last 20 backups automatically
-- Manifest tracking for all backups
-- One-click rollback capability
-
-### Report Export
-- **JSON reports** - Full diagnostic data
-- **Markdown export** - Human-readable format
-- Automatic report history (last 10 scans)
-- Saved to `~/.openclaw/clawdoctor-reports`
-
-### Network Diagnostics
-- Internet connectivity check
-- DNS resolution validation
-- Proxy detection & warnings
-
-### Extension & Skills Tracking
-- Counts installed extensions
-- Counts installed skills
-- Performance warnings for >20 extensions
-
----
-
-## 🛠 How It Works
-
-1. **Observe** - Collects 20+ system metrics:
-   - OpenClaw version & status
-   - Gateway state & processes
-   - Config file validation
-   - Log file analysis (error detection)
-   - Disk space & memory
-   - Environment variables
-   - File permissions
-   - Platform-specific checks (LaunchAgent/Services)
-
-2. **Diagnose** - Runs 17 diagnostic rules:
-   - Rule-based checks (always works)
-   - AI analysis (if OpenRouter API key available)
-   - Severity classification (Critical/Warning/Info)
-
-3. **Repair** - Offers smart fixes:
-   - `openclaw gateway start` - Start stopped gateway
-   - `openclaw doctor --yes` - Auto-repair config issues  
-   - `openclaw gateway restart` - Clear transient problems
-   - `openclaw gateway install --force` - Fix LaunchAgent (macOS)
-   - Permission fixes (Windows/macOS/Linux)
-   - All fixes use official OpenClaw CLI (safe!)
-
-4. **Verify** - Multi-check validation:
-   - OpenClaw status
-   - Gateway health
-   - Config file integrity
-   - Port availability
-
----
-
-## 📋 Requirements
-
-- Node.js 18+ 
-- OpenClaw installed
-- (Optional) OpenRouter API key in OpenClaw config for AI diagnostics
-
----
-
-## 🎯 Why ClawDoctor?
-
-**vs ClawAid:**
-- ClawAid: $1.99 USD per fix (paywall)
-- ClawDoctor: **100% FREE** (open source)
-
-**Tech Stack:**
-- TypeScript + Express + Vanilla JS
-- OpenRouter API (Claude Sonnet 4)
-- Rule-based fallback (no API needed)
-- Server-Sent Events (SSE) for real-time updates
-
----
-
-## 🔧 Development
-
-```bash
-# Clone
-git clone https://github.com/Michaelunkai/clawdoctor.git
-cd clawdoctor
-
-# Install
+# Install dependencies
 npm install
 
 # Build
 npm run build
 
-# Run locally
+# Run
 npm start
 ```
 
----
+The browser will automatically open at `http://localhost:8888`
 
-## 📦 Publishing to npm
+## 🎯 Features
+
+- **19 Diagnostic Checks** covering all common OpenClaw issues
+- **7 Automatic Fixes** that can be applied with one click
+- **Smart Log Filtering** - only shows relevant warnings/errors
+- **Beautiful Dark UI** - matching ClawAid's aesthetic
+- **Fix Summaries** - clear success/fail counts
+- **Feedback System** - report if fixes worked
+
+## 🩺 What It Detects
+
+### Critical Issues
+- OpenClaw not installed
+- Gateway not running
+- Config file missing or corrupted
+- Old Node.js version
+- Permission errors
+
+### Warnings
+- memory-context-bridge plugin config leftover
+- Doctor detected issues
+- Recent errors in logs
+- Low disk space
+- DNS resolution failures
+- Failed hook loading
+- Network binding issues
+- npm outdated
+
+### Info
+- State directory migration
+- No extensions installed
+- Too many extensions
+- TLS warnings (safe)
+- Unknown hook types
+
+## 🔧 Automatic Fixes
+
+ClawDoctor can automatically fix:
+1. Remove unused plugin configs (`memory-context-bridge`)
+2. Start OpenClaw gateway
+3. Initialize OpenClaw configuration
+4. Repair corrupted config files
+5. Run `openclaw doctor` to fix issues
+6. Restart gateway to clear errors
+7. And more!
+
+## 📊 Comparison with ClawAid
+
+| Feature | ClawAid | ClawDoctor v2.0.0 |
+|---------|---------|-------------------|
+| **Price** | $1.99/fix | **100% FREE** ✅ |
+| **Diagnostic Checks** | ~10 | **19** ✅ |
+| **Automatic Fixes** | Few | **7+** ✅ |
+| **UI Quality** | Good | **Beautiful** ✅ |
+| **Output Quality** | Technical | **User-Friendly** ✅ |
+| **Open Source** | No | **Yes (MIT)** ✅ |
+
+## 🛠️ Development
 
 ```bash
+# Install dependencies
+npm install
+
+# Build TypeScript
 npm run build
-npm publish
+
+# Run in dev mode
+npm start
+
+# Test locally
+npm test
 ```
 
+## 📁 Project Structure
+
+```
+clawdoctor/
+├── src/
+│   ├── index.ts          # CLI entry point
+│   ├── server.ts         # Express server & SSE
+│   ├── observe.ts        # System data collection
+│   ├── diagnose.ts       # Issue detection (19 checks)
+│   ├── execute.ts        # Fix execution
+│   ├── report.ts         # Report generation
+│   ├── scheduler.ts      # Scheduled health checks
+│   ├── performance.ts    # Performance monitoring
+│   └── cache.ts          # Diagnostic caching
+├── web/
+│   ├── index.html        # Clean dark UI
+│   ├── style.css         # Dark theme styles
+│   └── app.js            # Frontend logic
+└── package.json
+```
+
+## 🌟 Key Improvements Over v1.0.0
+
+- ✅ **No more garbage output** - filtered, clean logs
+- ✅ **Real fixes** - 19 checks, 7 automatic fixes
+- ✅ **Beautiful UI** - dark theme like ClawAid
+- ✅ **Smart truncation** - long errors limited to 150 chars
+- ✅ **Fix summaries** - success/fail counts
+- ✅ **Better UX** - emoji steps, smooth animations
+
+## 📝 License
+
+MIT License - 100% Free Forever
+
+## 🔗 Links
+
+- **GitHub:** https://github.com/Michaelunkai/clawdoctor
+- **Issues:** https://github.com/Michaelunkai/clawdoctor/issues
+- **OpenClaw:** https://docs.openclaw.ai
+
 ---
 
-## 🌐 Live Demo
-
-**🚀 Deploy it yourself in 2 minutes:**
-
-### Quick Deploy to Render (Free):
-1. Click this button: [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com)
-2. Sign in with GitHub
-3. Click "New +" → "Web Service" 
-4. Connect this repo: `Michaelunkai/clawdoctor`
-5. Render auto-detects `render.yaml` ✓
-6. Click "Create Web Service"
-7. Wait ~3 mins ⏱️
-8. **Copy your live URL** (e.g., `https://clawdoctor-xxxxx.onrender.com`)
-9. Come back here and replace this section with your URL!
-
-**Or use:** Railway, Fly.io, Vercel (see DEPLOY.md for alternatives)
-
----
-
-## 🤝 Contributing
-
-PRs welcome! Add new diagnostic rules, improve AI prompts, or enhance the UI.
-
----
-
-## 📄 License
-
-MIT © 2026 ClawDoctor
-
----
-
-## ⭐ Star This Repo
-
-If ClawDoctor saved you $1.99 (or just saved your time), give it a star! 🌟
-
----
-
-## 🙏 Credits
-
-Inspired by ClawAid architecture, rebuilt from scratch as 100% free alternative.
+**Made with ❤️ for the OpenClaw community**
