@@ -207,6 +207,20 @@ h1 {
   font-size: 3em;
   color: #667eea;
   margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.version-badge {
+  font-size: 0.35em;
+  background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 16px;
+  font-weight: normal;
+  box-shadow: 0 2px 8px rgba(76,175,80,0.3);
 }
 
 .subtitle {
