@@ -7,14 +7,26 @@ export interface ObservationData {
   timestamp: string;
   platform: string;
   nodeVersion: string;
+  npmVersion: string;
+  openclawVersion: string;
   openclawStatus: string;
   gatewayStatus: string;
   configExists: boolean;
   configContent?: string;
+  configValid?: boolean;
   recentLogs: string;
+  errorLogs: string[];
   portCheck: string;
   processCheck: string;
   doctorOutput?: string;
+  diskSpace: string;
+  memoryUsage: string;
+  environmentVars: Record<string, string>;
+  packageJsonExists: boolean;
+  openclawInstalled: boolean;
+  permissions: string;
+  launchAgent?: string; // macOS only
+  windowsService?: string; // Windows only
 }
 
 function safeExec(command: string, silent: boolean = false): string {
@@ -22,11 +34,14 @@ function safeExec(command: string, silent: boolean = false): string {
     const result = execSync(command, { 
       encoding: 'utf-8', 
       timeout: 10000,
-      stdio: silent ? 'pipe' : undefined
+      stdio: silent ? 'pipe' : undefined,
+      shell: os.platform() === 'win32' ? 'powershell.exe' : undefined
     });
     return result || '(no output)';
   } catch (error: any) {
-    return `Error: ${error.message}`;
+    const stderr = error.stderr?.toString() || '';
+    const stdout = error.stdout?.toString() || '';
+    return stderr || stdout || `Error: ${error.message}`;
   }
 }
 
@@ -35,52 +50,74 @@ export async function observe(onProgress?: (msg: string) => void): Promise<Obser
     if (onProgress) onProgress(msg);
   };
   
-  log('Checking platform info...');
+  log('🔍 Collecting system information...');
   const platform = os.platform();
+  
+  log('Checking Node.js and npm versions...');
   const nodeVersion = process.version;
+  const npmVersion = safeExec('npm --version', true).trim();
+  
+  log('Checking OpenClaw installation...');
+  const openclawVersion = safeExec('openclaw --version', true);
+  const openclawInstalled = !openclawVersion.includes('not recognized') && 
+                           !openclawVersion.includes('command not found');
   
   log('Running openclaw status...');
-  const openclawStatus = safeExec('openclaw status');
+  const openclawStatus = safeExec('openclaw status', true);
   
   log('Checking gateway status...');
-  const gatewayStatus = safeExec('openclaw gateway status');
+  const gatewayStatus = safeExec('openclaw gateway status', true);
   
-  log('Checking openclaw doctor...');
-  const doctorOutput = safeExec('openclaw doctor');
+  log('Running openclaw doctor...');
+  const doctorOutput = safeExec('openclaw doctor', true);
   
-  log('Reading config file...');
+  log('Checking configuration file...');
   const configPath = path.join(os.homedir(), '.openclaw', 'openclaw.json');
   const configExists = fs.existsSync(configPath);
   let configContent = undefined;
+  let configValid = false;
   
   if (configExists) {
     try {
-      configContent = fs.readFileSync(configPath, 'utf-8');
+      const raw = fs.readFileSync(configPath, 'utf-8');
+      // Try to parse as JSON5/JSON
+      JSON.parse(raw.replace(/\/\/.*/g, '').replace(/\/\*[\s\S]*?\*\//g, ''));
+      configValid = true;
       // Redact sensitive info
-      configContent = configContent.replace(/(apiKey|token|password)"\s*:\s*"[^"]+"/gi, '$1": "***REDACTED***"');
+      configContent = raw.replace(/(apiKey|token|password)"\s*:\s*"[^"]+"/gi, '$1": "***REDACTED***"');
     } catch (e) {
-      configContent = 'Error reading config';
+      configContent = 'Invalid JSON';
+      configValid = false;
     }
   }
   
   log('Checking recent logs...');
-  const logDir = path.join('/tmp', 'openclaw');
+  const logDir = path.join(os.tmpdir(), 'openclaw');
   let recentLogs = 'No logs found';
+  const errorLogs: string[] = [];
   
   if (fs.existsSync(logDir)) {
-    const logFiles = fs.readdirSync(logDir)
-      .filter(f => f.startsWith('openclaw-'))
-      .sort()
-      .reverse();
-    
-    if (logFiles.length > 0) {
-      const latestLog = path.join(logDir, logFiles[0]);
-      try {
+    try {
+      const logFiles = fs.readdirSync(logDir)
+        .filter(f => f.startsWith('openclaw-'))
+        .sort()
+        .reverse();
+      
+      if (logFiles.length > 0) {
+        const latestLog = path.join(logDir, logFiles[0]);
         const logs = fs.readFileSync(latestLog, 'utf-8');
-        recentLogs = logs.split('\n').slice(-50).join('\n');
-      } catch (e) {
-        recentLogs = 'Error reading logs';
+        const lines = logs.split('\n');
+        recentLogs = lines.slice(-100).join('\n');
+        
+        // Extract error lines
+        lines.forEach(line => {
+          if (line.match(/error|fail|crash|exception/i)) {
+            errorLogs.push(line.trim());
+          }
+        });
       }
+    } catch (e) {
+      recentLogs = 'Error reading logs';
     }
   }
   
@@ -92,19 +129,79 @@ export async function observe(onProgress?: (msg: string) => void): Promise<Obser
   log('Checking openclaw processes...');
   const processCheck = platform === 'win32'
     ? safeExec('tasklist | findstr node', true)
-    : safeExec('ps aux | grep openclaw', true);
+    : safeExec('ps aux | grep -i openclaw | grep -v grep', true);
+  
+  log('Checking disk space...');
+  const diskSpace = platform === 'win32'
+    ? safeExec('wmic logicaldisk get caption,freespace,size', true)
+    : safeExec('df -h /', true);
+  
+  log('Checking memory usage...');
+  const memoryUsage = platform === 'win32'
+    ? safeExec('wmic OS get FreePhysicalMemory,TotalVisibleMemorySize', true)
+    : safeExec('free -h', true);
+  
+  log('Checking environment variables...');
+  const environmentVars: Record<string, string> = {};
+  const relevantEnvVars = ['PATH', 'NODE_ENV', 'HTTP_PROXY', 'HTTPS_PROXY', 'NO_PROXY', 'HOME', 'USERPROFILE'];
+  relevantEnvVars.forEach(key => {
+    if (process.env[key]) {
+      environmentVars[key] = process.env[key]!;
+    }
+  });
+  
+  log('Checking package.json...');
+  const packageJsonPath = path.join(os.homedir(), '.openclaw', 'package.json');
+  const packageJsonExists = fs.existsSync(packageJsonPath);
+  
+  log('Checking file permissions...');
+  const openclawDir = path.join(os.homedir(), '.openclaw');
+  const permissions = fs.existsSync(openclawDir)
+    ? safeExec(platform === 'win32' 
+        ? `icacls "${openclawDir}"` 
+        : `ls -la "${openclawDir}"`, true)
+    : 'Directory not found';
+  
+  // Platform-specific checks
+  let launchAgent = undefined;
+  let windowsService = undefined;
+  
+  if (platform === 'darwin') {
+    log('Checking macOS LaunchAgent...');
+    const plistPath = path.join(os.homedir(), 'Library', 'LaunchAgents', 'ai.openclaw.gateway.plist');
+    if (fs.existsSync(plistPath)) {
+      launchAgent = fs.readFileSync(plistPath, 'utf-8');
+    }
+  } else if (platform === 'win32') {
+    log('Checking Windows service...');
+    windowsService = safeExec('sc query openclaw', true);
+  }
+  
+  log('✅ Data collection complete');
   
   return {
     timestamp: new Date().toISOString(),
     platform,
     nodeVersion,
+    npmVersion,
+    openclawVersion,
     openclawStatus,
     gatewayStatus,
     configExists,
     configContent,
+    configValid,
     recentLogs,
+    errorLogs,
     portCheck,
     processCheck,
-    doctorOutput
+    doctorOutput,
+    diskSpace,
+    memoryUsage,
+    environmentVars,
+    packageJsonExists,
+    openclawInstalled,
+    permissions,
+    launchAgent,
+    windowsService
   };
 }
