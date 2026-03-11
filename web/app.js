@@ -28,6 +28,11 @@ function showToast(message, type = 'info', duration = 5000) {
   
   container.appendChild(toast);
   
+  // Play sound if enabled
+  if (localStorage.getItem('sound') === 'true') {
+    playNotificationSound(type);
+  }
+  
   if (duration > 0) {
     setTimeout(() => {
       toast.style.animation = 'slideOut 0.3s ease-in';
@@ -36,6 +41,36 @@ function showToast(message, type = 'info', duration = 5000) {
   }
   
   return toast.id;
+}
+
+// Sound notification system
+function playNotificationSound(type) {
+  const frequencies = {
+    success: 800,
+    error: 400,
+    warning: 600,
+    info: 700
+  };
+  
+  try {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.frequency.value = frequencies[type] || 700;
+    oscillator.type = 'sine';
+    
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.3);
+  } catch (e) {
+    // Sound not supported
+  }
 }
 
 // Loading overlay control
@@ -181,6 +216,21 @@ window.addEventListener('DOMContentLoaded', () => {
 
 function startDiagnosis(autoFix = false) {
   showSection('progress');
+  showToast('Starting diagnostic scan...', 'info', 3000);
+  
+  const startTime = Date.now();
+  const progressBar = document.querySelector('.progress-fill');
+  let progress = 0;
+  
+  // Animate progress bar
+  const progressInterval = setInterval(() => {
+    if (progress < 90) {
+      progress += Math.random() * 10;
+      if (progressBar) {
+        progressBar.style.width = Math.min(progress, 90) + '%';
+      }
+    }
+  }, 500);
   
   const eventSource = new EventSource('/api/diagnose');
   
@@ -193,6 +243,12 @@ function startDiagnosis(autoFix = false) {
         break;
       
       case 'diagnosis':
+        clearInterval(progressInterval);
+        if (progressBar) progressBar.style.width = '100%';
+        
+        const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+        showToast(`Scan completed in ${elapsed}s`, 'success', 3000);
+        
         eventSource.close();
         currentDiagnosis = data.data;
         showDiagnosis(data.data, autoFix);
