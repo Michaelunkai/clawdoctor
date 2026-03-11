@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClawDoctor - 100% Free OpenClaw Diagnostics</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🦞 ClawDoctor</h1>
+      <p class="subtitle">100% Free OpenClaw Diagnostics & Repair</p>
+    </header>
+
+    <div id="status-area">
+      <div id="progress-section" class="section hidden">
+        <h2>Diagnosing...</h2>
+        <div class="progress-bar">
+          <div class="progress-fill"></div>
+        </div>
+        <div id="progress-log"></div>
+      </div>
+
+      <div id="diagnosis-section" class="section hidden">
+        <div id="health-badge"></div>
+        <h2 id="diagnosis-title"></h2>
+        <p id="diagnosis-text"></p>
+        
+        <div id="warnings-section" class="hidden">
+          <h3>Warnings</h3>
+          <ul id="warnings-list"></ul>
+        </div>
+
+        <div id="options-section" class="hidden">
+          <h3>Repair Options</h3>
+          <div id="options-container"></div>
+        </div>
+      </div>
+
+      <div id="error-section" class="section hidden">
+        <h2>❌ Error</h2>
+        <p id="error-text"></p>
+        <button onclick="location.reload()">Try Again</button>
+      </div>
+
+      <div id="complete-section" class="section hidden">
+        <h2>✅ Complete</h2>
+        <p id="complete-text"></p>
+        <a href="https://github.com/Michaelunkai/clawdoctor" target="_blank" class="github-link">
+          ⭐ Star on GitHub
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

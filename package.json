@@ -1,0 +1,44 @@
+{
+  "name": "clawdoctor",
+  "version": "1.0.0",
+  "description": "100% Free AI-powered diagnostic and repair tool for OpenClaw",
+  "main": "dist/index.js",
+  "bin": {
+    "clawdoctor": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "openclaw",
+    "openclaw-fix",
+    "openclaw-repair",
+    "openclaw-diagnostic",
+    "free",
+    "ai",
+    "diagnostics"
+  ],
+  "author": "ClawDoctor",
+  "license": "MIT",
+  "files": [
+    "dist",
+    "web"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "open": "^9.1.0",
+    "get-port": "^7.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.2",
+    "ts-node": "^10.9.2"
+  }
+}
