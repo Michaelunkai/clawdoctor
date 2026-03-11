@@ -1,5 +1,15 @@
 # ClawDoctor - Complete Feature List
 
+## 🏆 Better Than ClawAid
+See [WHY-BETTER.md](WHY-BETTER.md) for detailed comparison.
+
+**Quick Stats:**
+- ✅ 100% FREE (vs $1.99/fix)
+- ✅ 30 Rules (vs ~10)
+- ✅ Dark Mode (vs none)
+- ✅ Auto-Backup (vs none)
+- ✅ Open Source (vs closed)
+
 ## 🎯 Core Capabilities
 
 ### Two-Button Interface
@@ -42,7 +52,7 @@
 
 ---
 
-## 📊 Diagnostic Rules (17 Total)
+## 📊 Diagnostic Rules (30 Total - More Than ClawAid!)
 
 ### CRITICAL Issues (Auto-flagged as must-fix)
 

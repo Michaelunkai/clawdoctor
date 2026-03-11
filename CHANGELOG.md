@@ -1,5 +1,50 @@
 # ClawDoctor Changelog
 
+## [1.1.0] - 2026-03-11 (15-Minute Power Update)
+
+### 🏆 Better Than ClawAid Edition
+
+**Now Objectively Better Than ClawAid in EVERY Way:**
+- ✅ 100% FREE (ClawAid: $1.99/fix)
+- ✅ 30 Rules (ClawAid: ~10)
+- ✅ Dark Mode (ClawAid: none)
+- ✅ Auto-Refresh (ClawAid: none)
+- ✅ Comparison Modal (shows why we're better)
+- ✅ Auto-Backup (ClawAid: none)
+- ✅ Open Source (ClawAid: closed)
+
+### 🆕 New Features
+- **Dark Mode Toggle** - Beautiful dark theme with localStorage persistence
+- **Auto-Refresh** - Optional 5-minute health monitoring
+- **Comparison Modal** - Interactive table showing ClawDoctor vs ClawAid
+- **30 Diagnostic Rules** - Up from 22, now more comprehensive than any alternative
+- **WHY-BETTER.md** - Detailed comparison document
+
+### 🔧 New Diagnostic Rules (23-30)
+1. **#23** - Too many node processes (memory leak detection)
+2. **#24** - Large log files (rotation needed)
+3. **#25** - Port already in use (EADDRINUSE critical detection)
+4. **#26** - Out of memory errors (ENOMEM detection)
+5. **#27** - SSL/certificate errors (API call issues)
+6. **#28** - Rate limiting (429 errors, reduce frequency)
+7. **#29** - Recent gateway restart (stability check)
+8. **#30** - Config file corruption (NaN/undefined detection)
+
+### 🎨 UI Improvements
+- Responsive header with controls
+- Theme toggle button (🌙/☀️)
+- Auto-refresh toggle button
+- Comparison highlight in header
+- Modal system for comparisons
+- Better contrast in dark mode
+
+### 📚 Documentation
+- Added WHY-BETTER.md (comprehensive comparison)
+- Updated FEATURES.md with new capabilities
+- Updated README badges
+
+---
+
 ## [1.0.0] - 2026-03-11
 
 ### 🎉 Initial Release
