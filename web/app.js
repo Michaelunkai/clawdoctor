@@ -1,11 +1,47 @@
 // Global state
 let currentObservation = null;
 let currentDiagnosis = null;
+let autoRefreshInterval = null;
 
 // Wait for user action instead of auto-starting
 window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('diagnose-btn').addEventListener('click', () => startDiagnosis(false));
   document.getElementById('scan-fix-btn').addEventListener('click', () => startDiagnosis(true));
+  
+  // Dark mode toggle
+  const themeToggle = document.getElementById('theme-toggle');
+  const savedTheme = localStorage.getItem('clawdoctor-theme');
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark-mode');
+    themeToggle.textContent = '☀️';
+    themeToggle.classList.add('active');
+  }
+  
+  themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    themeToggle.textContent = isDark ? '☀️' : '🌙';
+    themeToggle.classList.toggle('active');
+    localStorage.setItem('clawdoctor-theme', isDark ? 'dark' : 'light');
+  });
+  
+  // Auto-refresh toggle
+  const autoRefresh = document.getElementById('auto-refresh');
+  autoRefresh.addEventListener('click', () => {
+    if (autoRefreshInterval) {
+      clearInterval(autoRefreshInterval);
+      autoRefreshInterval = null;
+      autoRefresh.classList.remove('active');
+      autoRefresh.title = 'Auto-Refresh Every 5min (OFF)';
+    } else {
+      autoRefreshInterval = setInterval(() => {
+        if (document.getElementById('start-section').classList.contains('hidden')) return;
+        startDiagnosis(false);
+      }, 300000); // 5 minutes
+      autoRefresh.classList.add('active');
+      autoRefresh.title = 'Auto-Refresh Every 5min (ON)';
+    }
+  });
   
   // Load recent reports count
   fetch('/api/reports')
@@ -16,6 +52,19 @@ window.addEventListener('DOMContentLoaded', () => {
       }
     })
     .catch(() => {});
+  
+  // Show comparison modal
+  document.getElementById('show-comparison').addEventListener('click', () => {
+    document.getElementById('comparison-modal').classList.remove('hidden');
+  });
+  
+  // Show comparison modal on first visit
+  if (!localStorage.getItem('clawdoctor-seen-comparison')) {
+    setTimeout(() => {
+      document.getElementById('comparison-modal').classList.remove('hidden');
+      localStorage.setItem('clawdoctor-seen-comparison', 'true');
+    }, 2000);
+  }
 });
 
 function startDiagnosis(autoFix = false) {

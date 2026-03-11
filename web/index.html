@@ -9,8 +9,17 @@
 <body>
   <div class="container">
     <header>
-      <h1>🦞 ClawDoctor</h1>
-      <p class="subtitle">100% Free OpenClaw Diagnostics & Repair</p>
+      <div class="header-content">
+        <div>
+          <h1>🦞 ClawDoctor</h1>
+          <p class="subtitle">100% Free OpenClaw Diagnostics & Repair</p>
+          <p class="comparison">✨ Better than ClawAid: Free Forever • 30 Rules • Auto-Backup • Open Source <button id="show-comparison" class="link-button">Why?</button></p>
+        </div>
+        <div class="header-controls">
+          <button id="theme-toggle" class="btn-icon" title="Toggle Dark Mode">🌙</button>
+          <button id="auto-refresh" class="btn-icon" title="Auto-Refresh Every 5min">🔄</button>
+        </div>
+      </div>
     </header>
 
     <div id="status-area">
@@ -85,6 +94,76 @@
             ⭐ Star on GitHub
           </a>
         </div>
+      </div>
+    </div>
+    
+    <!-- Comparison Modal -->
+    <div id="comparison-modal" class="modal hidden">
+      <div class="modal-content">
+        <button class="modal-close" onclick="document.getElementById('comparison-modal').classList.add('hidden')">×</button>
+        <h2>🏆 Why ClawDoctor Beats ClawAid</h2>
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>ClawAid</th>
+              <th>ClawDoctor ✨</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Cost</td>
+              <td>$1.99 per fix</td>
+              <td><strong>100% FREE Forever</strong></td>
+            </tr>
+            <tr>
+              <td>Diagnostic Rules</td>
+              <td>Unknown (~10)</td>
+              <td><strong>30 Comprehensive Rules</strong></td>
+            </tr>
+            <tr>
+              <td>Auto-Backup</td>
+              <td>❌ No</td>
+              <td><strong>✅ Automatic (config files)</strong></td>
+            </tr>
+            <tr>
+              <td>Report Export</td>
+              <td>❌ No</td>
+              <td><strong>✅ JSON + Markdown</strong></td>
+            </tr>
+            <tr>
+              <td>Network Diagnostics</td>
+              <td>❌ No</td>
+              <td><strong>✅ DNS + Connectivity</strong></td>
+            </tr>
+            <tr>
+              <td>Dark Mode</td>
+              <td>❌ No</td>
+              <td><strong>✅ Yes</strong></td>
+            </tr>
+            <tr>
+              <td>Auto-Refresh</td>
+              <td>❌ No</td>
+              <td><strong>✅ Every 5 minutes</strong></td>
+            </tr>
+            <tr>
+              <td>Open Source</td>
+              <td>❌ Closed</td>
+              <td><strong>✅ MIT License</strong></td>
+            </tr>
+            <tr>
+              <td>Manual + Auto Modes</td>
+              <td>Auto only</td>
+              <td><strong>✅ Both (Diagnose + Scan & Fix)</strong></td>
+            </tr>
+            <tr>
+              <td>Rollback Support</td>
+              <td>❌ No</td>
+              <td><strong>✅ Yes (backup system)</strong></td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="modal-footer">⭐ Star us on <a href="https://github.com/Michaelunkai/clawdoctor" target="_blank">GitHub</a> if you love ClawDoctor!</p>
       </div>
     </div>
   </div>

@@ -163,6 +163,53 @@ export function applyRules(data: ObservationData): RuleResult {
     findings.push('INFO: ' + data.extensionCount + ' extensions installed - may impact startup time');
   }
   
+  // RULE 23: Check for duplicate node processes
+  if (data.processCheck) {
+    const nodeProcesses = data.processCheck.split('\n').filter(l => l.includes('node'));
+    if (nodeProcesses.length > 5) {
+      findings.push('WARNING: ' + nodeProcesses.length + ' Node.js processes detected - possible memory leak');
+    }
+  }
+  
+  // RULE 24: Check OpenClaw log file size
+  if (data.recentLogs && data.recentLogs.length > 100000) {
+    findings.push('WARNING: Log file is very large - consider log rotation');
+  }
+  
+  // RULE 25: Check for common error patterns
+  if (data.errorLogs.some(log => log.includes('EADDRINUSE'))) {
+    findings.push('CRITICAL: Port already in use - another service is using port 18789');
+    critical = true;
+  }
+  
+  // RULE 26: Check for out of memory errors
+  if (data.errorLogs.some(log => log.includes('out of memory') || log.includes('ENOMEM'))) {
+    findings.push('CRITICAL: Out of memory errors detected - system resources exhausted');
+    critical = true;
+  }
+  
+  // RULE 27: Check for SSL/certificate errors
+  if (data.errorLogs.some(log => log.includes('certificate') || log.includes('SSL'))) {
+    findings.push('WARNING: SSL/certificate errors detected - may affect API calls');
+  }
+  
+  // RULE 28: Check for rate limiting
+  if (data.errorLogs.some(log => log.includes('429') || log.includes('rate limit'))) {
+    findings.push('WARNING: Rate limiting detected - reduce API request frequency');
+  }
+  
+  // RULE 29: Check gateway uptime (if available in logs)
+  const uptimeMatch = data.gatewayStatus.match(/uptime[:\s]+(\d+)/i);
+  if (uptimeMatch && parseInt(uptimeMatch[1]) < 300) {
+    findings.push('WARNING: Gateway recently restarted (uptime < 5 minutes) - may indicate instability');
+  }
+  
+  // RULE 30: Check for workspace corruption
+  if (data.configContent && data.configContent.includes('undefined') || data.configContent?.includes('NaN')) {
+    findings.push('CRITICAL: Config file contains corrupted data');
+    critical = true;
+  }
+  
   // Build diagnosis
   const diagnosis: DiagnosisResult = buildDiagnosis(findings, critical, data);
   
