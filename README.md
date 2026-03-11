@@ -44,7 +44,7 @@ Opens a clean web UI with two powerful buttons:
 
 ---
 
-## 🔍 What It Checks (17+ Diagnostic Rules)
+## 🔍 What It Checks (22 Diagnostic Rules)
 
 ### Critical Issues:
 ✅ OpenClaw installation status  
@@ -68,7 +68,36 @@ Opens a clean web UI with two powerful buttons:
 ✅ Proxy environment variables  
 ✅ Memory usage  
 ✅ Process status  
-✅ Recent log analysis
+✅ Recent log analysis  
+✅ Network connectivity  
+✅ DNS resolution  
+✅ Extensions count  
+✅ Skills count  
+
+## 🛡️ Safety Features
+
+### Automatic Backups
+- **Config file backup** before any changes
+- Stored in `~/.openclaw/clawdoctor-backups`
+- Keeps last 20 backups automatically
+- Manifest tracking for all backups
+- One-click rollback capability
+
+### Report Export
+- **JSON reports** - Full diagnostic data
+- **Markdown export** - Human-readable format
+- Automatic report history (last 10 scans)
+- Saved to `~/.openclaw/clawdoctor-reports`
+
+### Network Diagnostics
+- Internet connectivity check
+- DNS resolution validation
+- Proxy detection & warnings
+
+### Extension & Skills Tracking
+- Counts installed extensions
+- Counts installed skills
+- Performance warnings for >20 extensions
 
 ---
 

@@ -1,6 +1,9 @@
 import { execSync } from 'child_process';
 import * as os from 'os';
+import * as path from 'path';
+import * as fs from 'fs';
 import { DiagnosticAction } from './diagnose';
+import { backupManager } from './backup';
 
 export interface ExecuteResult {
   success: boolean;
@@ -18,9 +21,24 @@ export async function execute(
   
   const outputs: string[] = [];
   const errors: string[] = [];
+  const backupIds: string[] = [];
   let successCount = 0;
   
   log(`🔧 Starting execution of ${steps.length} step(s)...`);
+  
+  // Create backup of config file if it exists
+  const configPath = path.join(os.homedir(), '.openclaw', 'openclaw.json');
+  if (fs.existsSync(configPath)) {
+    log('💾 Creating backup of openclaw.json...');
+    const backupId = await backupManager.backupFile(configPath, {
+      reason: 'Pre-execution backup',
+      steps: steps.length
+    });
+    if (backupId) {
+      backupIds.push(backupId);
+      log(`✅ Backup created: ${backupId}`);
+    }
+  }
   
   for (let i = 0; i < steps.length; i++) {
     const step = steps[i];
